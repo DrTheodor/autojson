@@ -83,8 +83,10 @@ public class BakedAutoSchema<T> implements Schema<T> {
     public <To> void deserialize(JsonAdapter<Object, To> auto, JsonDeserializationContext c, T t, String field) {
         FieldType<T, ?> type = this.map.get(field);
 
-        if (type == null && c.auto().logMissingEntries()) {
-            c.auto().log("Missing entry '" + field + "' on " + this.clazz);
+        if (type == null) {
+            if (c.auto().logMissingEntries())
+                c.auto().log("Missing entry '" + field + "' on " + this.clazz);
+
             return;
         }
 

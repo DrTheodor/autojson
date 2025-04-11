@@ -18,7 +18,7 @@ public class ToObjBenchmarks extends AutoVsGsonBenchmark {
     @Benchmark
     public static void gsonStr2Obj(Blackhole blackhole) {
         for (int i = 0; i < iters; i++) {
-            blackhole.consume(adapter.fromJson(JSON, Bean.class));
+            blackhole.consume(gson.fromJson(JSON, Bean.class));
         }
     }
 }

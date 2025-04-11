@@ -12,6 +12,7 @@ public final class LazilyParsedNumber extends Number {
         this.value = value;
     }
 
+    @Override
     public int intValue() {
         try {
             return UnsafeUtil.parseInt(this.value);
@@ -24,6 +25,7 @@ public final class LazilyParsedNumber extends Number {
         }
     }
 
+    @Override
     public long longValue() {
         try {
             return UnsafeUtil.parseLong(this.value);
@@ -32,12 +34,24 @@ public final class LazilyParsedNumber extends Number {
         }
     }
 
+    @Override
     public float floatValue() {
         return UnsafeUtil.parseFloat(this.value);
     }
 
+    @Override
     public double doubleValue() {
         return UnsafeUtil.parseDouble(this.value);
+    }
+
+    @Override
+    public short shortValue() {
+        return UnsafeUtil.parseShort(this.value);
+    }
+
+    @Override
+    public byte byteValue() {
+        return UnsafeUtil.parseByte(this.value);
     }
 
     public String toString() {

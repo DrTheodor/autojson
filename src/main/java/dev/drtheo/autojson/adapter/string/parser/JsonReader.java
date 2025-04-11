@@ -19,7 +19,8 @@ public class JsonReader {
     private boolean expectsValue = true;
     private boolean isMapped = false;
 
-    private final Deque<Boolean> objectStack = new ArrayDeque<>();
+    private int depth;
+    private final Boolean[] objectStack = new Boolean[32];
 
     public JsonReader(String raw) {
         this.reader = new StringReader(raw);
@@ -198,7 +199,9 @@ public class JsonReader {
         this.expectsValue = false;
 
         this.isMapped = true;
-        this.objectStack.push(true);
+
+        this.depth++;
+        this.objectStack[this.depth] = true;
     }
 
     private void endObject() {
@@ -211,7 +214,8 @@ public class JsonReader {
         this.expectsValue = true;
 
         this.isMapped = false;
-        this.objectStack.push(false);
+
+        this.objectStack[this.depth++] = false;
     }
 
     private void endArray() {
@@ -220,9 +224,9 @@ public class JsonReader {
     }
 
     private void popStack() {
-        this.objectStack.pop();
+        this.objectStack[this.depth--] = null;
 
-        this.isMapped = !this.objectStack.isEmpty() && this.objectStack.peek();
+        this.isMapped = this.depth > 0 && this.objectStack[this.depth];
         this.expectsValue = !this.isMapped;
     }
 

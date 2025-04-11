@@ -104,13 +104,10 @@ public class Bean {
             adapter.fromJson(raw, Bean.class);
         }
 
-        System.out.println(adapter.fromJson(raw, Bean.class));
-        System.out.println(bean);
-
         for (int i = 0; i < 1_000_000; i++) {
             adapter.toJson(bean, Bean.class);
         }
 
-        System.out.println(adapter.toJson(bean, Bean.class));
+        System.out.println(adapter.fromJson(raw, Bean.class));
     }
 }
