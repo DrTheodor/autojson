@@ -10,6 +10,17 @@ public class AutoJSON {
 
     private final Map<Class<?>, BakedAutoSchema<?>> schemas = new HashMap<>();
 
+    private int layer = 0;
+    private boolean logMisingEntries = true;
+
+    public void setLogMisingEntries(boolean logMisingEntries) {
+        this.logMisingEntries = logMisingEntries;
+    }
+
+    public void setLayer(int layer) {
+        this.layer = layer;
+    }
+
     public void bake(Class<?> clazz) {
         this.schemas.put(clazz, BakedAutoSchema.bake(clazz));
     }
@@ -28,6 +39,10 @@ public class AutoJSON {
 
     public <F, T> F fromJson(JsonAdapter<F, T> adapter, T object, Class<F> clazz) {
         return adapter.fromJson(object, clazz);
+    }
+
+    public int layer() {
+        return layer;
     }
 
     public boolean logMissingEntries() {
