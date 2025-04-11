@@ -3,13 +3,8 @@ package dev.drtheo.autojson.benchmark;
 import org.openjdk.jmh.annotations.*;
 import org.openjdk.jmh.infra.Blackhole;
 
-import java.util.concurrent.TimeUnit;
-
-@Warmup(iterations = 3)
-@Measurement(iterations = 10)
-@Fork(value = 1, warmups = 1)
-@OutputTimeUnit(TimeUnit.MILLISECONDS)
-@BenchmarkMode(Mode.AverageTime)
+@Warmup(iterations = 0)
+@Measurement(iterations = 0)
 public class ToJsonBenchmarks extends AutoVsGsonBenchmark {
 
     @Benchmark

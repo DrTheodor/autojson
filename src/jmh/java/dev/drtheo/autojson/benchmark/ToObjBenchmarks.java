@@ -2,8 +2,10 @@ package dev.drtheo.autojson.benchmark;
 
 import dev.drtheo.autojson.Bean;
 import org.openjdk.jmh.annotations.Benchmark;
+import org.openjdk.jmh.annotations.Measurement;
 import org.openjdk.jmh.infra.Blackhole;
 
+//@Measurement(iterations = 0)
 public class ToObjBenchmarks extends AutoVsGsonBenchmark {
 
     @Benchmark

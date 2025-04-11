@@ -1,6 +1,7 @@
 package dev.drtheo.autojson;
 
 import dev.drtheo.autojson.adapter.JsonAdapter;
+import dev.drtheo.autojson.bake.unsafe.BakedAutoSchema;
 
 import java.util.HashMap;
 import java.util.Map;

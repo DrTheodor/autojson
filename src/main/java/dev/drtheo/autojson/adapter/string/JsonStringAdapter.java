@@ -5,13 +5,13 @@ import dev.drtheo.autojson.adapter.JsonAdapter;
 import dev.drtheo.autojson.ast.JsonElement;
 import dev.drtheo.autojson.ast.JsonObject;
 import dev.drtheo.autojson.ast.JsonPrimitive;
-import dev.drtheo.autojson.bake.UnsafeUtil;
+import dev.drtheo.autojson.bake.unsafe.UnsafeUtil;
 
 import java.io.IOException;
 
 public class JsonStringAdapter implements JsonAdapter<Object, String> {
 
-    private final AutoJSON auto;
+    protected final AutoJSON auto;
 
     public JsonStringAdapter(AutoJSON auto) {
         this.auto = auto;
@@ -19,19 +19,17 @@ public class JsonStringAdapter implements JsonAdapter<Object, String> {
 
     @Override
     public <T> String toJson(T obj, Class<?> clazz) {
-        if (UnsafeUtil.isPrimitive(clazz))
+        if (UnsafeUtil.isPrimitive(clazz) || clazz == String.class)
             return obj.toString();
 
-        JsonStringBuilder jsb = new JsonStringBuilder(this);
+        JsonStringBuilder ctx = new JsonStringBuilder(this);
 
-        toJson(jsb, obj, clazz);
-        return jsb.toString();
+        toJson(ctx, obj, clazz);
+        return ctx.toString();
     }
 
-    protected <T> void toJson(JsonStringBuilder builder, T obj, Class<?> clazz) {
-        builder.begin();
-        auto.schema(clazz).serialize(this, builder, obj);
-        builder.end();
+    protected <T> void toJson(JsonStringBuilder ctx, T obj, Class<?> clazz) {
+        auto.schema(clazz).serialize(this, ctx, obj);
     }
 
     @Override

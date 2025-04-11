@@ -1,14 +1,14 @@
-package dev.drtheo.autojson;
+package dev.drtheo.autojson.bake.unsafe;
 
+import dev.drtheo.autojson.Schema;
 import dev.drtheo.autojson.adapter.JsonAdapter;
 import dev.drtheo.autojson.adapter.JsonSerializationContext;
 import dev.drtheo.autojson.ast.JsonElement;
 import dev.drtheo.autojson.ast.JsonObject;
-import dev.drtheo.autojson.ast.JsonPrimitive;
-import dev.drtheo.autojson.bake.ClassAdapter;
-import dev.drtheo.autojson.bake.UnsafeUtil;
 
 import java.lang.reflect.Field;
+import java.util.HashMap;
+import java.util.Map;
 
 public class BakedAutoSchema<T> implements Schema<T> {
 
@@ -16,12 +16,16 @@ public class BakedAutoSchema<T> implements Schema<T> {
     public static <T> BakedAutoSchema<T> bake(Class<T> clazz) {
         Field[] fields = clazz.getDeclaredFields();
         FieldType<T, ?>[] types = new FieldType[fields.length];
+        Map<String, FieldType<T, ?>> map = new HashMap<>(types.length);
 
         for (int i = 0; i < fields.length; i++) {
-            types[i] = FieldType.from(fields[i]);
+            FieldType<T, ?> type = FieldType.from(fields[i]);
+
+            types[i] = type;
+            map.put(type.name(), type);
         }
 
-        return new BakedAutoSchema<>(clazz, types);
+        return new BakedAutoSchema<>(clazz, types, map);
     }
 
     record FieldType<T, E>(Class<E> type, ClassAdapter<E> adapter, String name, long offset) {
@@ -45,20 +49,26 @@ public class BakedAutoSchema<T> implements Schema<T> {
 
     private final Class<T> clazz;
     private final FieldType<T, ?>[] fields;
+    private final Map<String, FieldType<T, ?>> map;
 
-    private BakedAutoSchema(Class<T> clazz, FieldType<T, ?>[] fields) {
+    private BakedAutoSchema(Class<T> clazz, FieldType<T, ?>[] fields, Map<String, FieldType<T, ?>> map) {
         this.clazz = clazz;
         this.fields = fields;
+        this.map = map;
     }
 
     @Override
-    public <To> void serialize(JsonAdapter<Object, To> auto, JsonSerializationContext c, T t) {
+    public <To> JsonSerializationContext.Built serialize(JsonAdapter<Object, To> auto, JsonSerializationContext c, T t) {
         if (!this.clazz.isInstance(t))
-            throw new IllegalArgumentException();
+            throw new IllegalArgumentException(this.clazz + " != " + t.getClass());
+
+        JsonSerializationContext.JsonObject object = c.object();
 
         for (FieldType<T, ?> type : this.fields) {
-            c.put(type.name(), type.get(t));
+            object.put(type.name(), type.get(t));
         }
+
+        return object.build();
     }
 
     @Override
@@ -78,37 +88,27 @@ public class BakedAutoSchema<T> implements Schema<T> {
         }
     }
 
+    @Override
+    public <To> void deserialize(JsonAdapter<Object, To> auto, T t, String field, JsonElement element) {
+        FieldType<T, ?> type = this.map.get(field);
+        deserialize(auto, type, t, element);
+    }
 
+    @Override
+    public T instantiate() {
+        try {
+            return (T) UnsafeUtil.UNSAFE.allocateInstance(this.clazz);
+        } catch (InstantiationException e) {
+            throw new RuntimeException(e);
+        }
+    }
 
     private static <T, E, To> void deserialize(JsonAdapter<Object, To> auto, FieldType<T, E> field, T t, JsonObject object) {
         JsonElement element = object.get(field.name());
+        deserialize(auto, field, t, element);
+    }
 
-        Class<E> clazz = field.type();
-
-        /*if (UnsafeUtil.isChar(clazz)) {
-            element = new JsonPrimitive(element.getAsJsonPrimitive().getAsCharacter());
-        } else if(UnsafeUtil.isNumber(clazz)) {
-            Number wrapped = element.getAsJsonPrimitive().getAsNumber();
-
-            if (clazz == double.class || clazz == Double.class)
-                element = new JsonPrimitive(wrapped.doubleValue());
-
-            if (clazz == float.class || clazz == Float.class)
-                element = new JsonPrimitive(wrapped.floatValue());
-
-            if (clazz == long.class || clazz == Long.class)
-                element = new JsonPrimitive(wrapped.longValue());
-
-            if (clazz == short.class || clazz == Short.class)
-                element = new JsonPrimitive(wrapped.shortValue());
-
-            if (clazz == byte.class || clazz == Byte.class)
-                element = new JsonPrimitive(wrapped.byteValue());
-
-            if (clazz == int.class || clazz == Integer.class)
-                element = new JsonPrimitive(wrapped.intValue());
-        }*/
-
+    private static <T, E, To> void deserialize(JsonAdapter<Object, To> auto, FieldType<T, E> field, T t, JsonElement element) {
         field.set(t, auto.fromJson(element, field.type()));
     }
 }

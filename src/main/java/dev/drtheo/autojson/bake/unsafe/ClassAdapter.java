@@ -1,4 +1,4 @@
-package dev.drtheo.autojson.bake;
+package dev.drtheo.autojson.bake.unsafe;
 
 import org.jetbrains.annotations.NotNull;
 import sun.misc.Unsafe;
@@ -65,7 +65,7 @@ public interface ClassAdapter<T> {
     final class Primitive<T> implements ClassAdapter<T> {
         private final ClassAdapter<T> child;
         private final T def;
-        
+
         public Primitive(UnsafeGetter<T> getter, UnsafeSetter<T> setter, T def) {
             this(new Simple<>(getter, setter), def);
         }

@@ -1,9 +1,9 @@
 package dev.drtheo.autojson.adapter.string;
 
 import dev.drtheo.autojson.adapter.JsonSerializationContext;
-import dev.drtheo.autojson.bake.UnsafeUtil;
+import dev.drtheo.autojson.bake.unsafe.UnsafeUtil;
 
-public class JsonStringBuilder implements JsonSerializationContext {
+public class JsonStringBuilder implements JsonSerializationContext, JsonSerializationContext.JsonObject, JsonSerializationContext.JsonPrimitive {
 
     private final JsonStringAdapter adapter;
 
@@ -15,12 +15,18 @@ public class JsonStringBuilder implements JsonSerializationContext {
     }
 
     @Override
-    public void put(String key, Object value) {
+    public JsonStringBuilder put(String key, Object value) {
         if (!first)
             builder.append(",");
 
         builder.append("\"").append(key).append("\":");
+        this.value(value);
 
+        first = false;
+        return this;
+    }
+
+    protected void value(Object value) {
         if (value == null) {
             builder.append("null");
         } else if (value instanceof String || value instanceof Character) {
@@ -32,20 +38,30 @@ public class JsonStringBuilder implements JsonSerializationContext {
         } else {
             this.adapter.toJson(this, value, value.getClass());
         }
-
-        first = false;
     }
 
-    public void begin() {
-        this.builder.append("{");
-    }
-
-    public void end() {
+    @Override
+    public JsonSerializationContext.Built build() {
+        this.first = false;
         this.builder.append("}");
+        return this;
     }
 
     @Override
     public String toString() {
         return builder.toString();
+    }
+
+    @Override
+    public JsonObject object() {
+        this.first = true;
+        this.builder.append("{");
+        return this;
+    }
+
+    @Override
+    public JsonPrimitive primitive(Object o) {
+        this.value(o);
+        return this;
     }
 }

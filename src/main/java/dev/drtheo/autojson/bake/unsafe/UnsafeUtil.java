@@ -1,4 +1,4 @@
-package dev.drtheo.autojson.bake;
+package dev.drtheo.autojson.bake.unsafe;
 
 import sun.misc.Unsafe;
 
@@ -18,8 +18,22 @@ public class UnsafeUtil {
         }
     }
 
+    private static final long BOXED_FLAGS =
+            (1L << Integer.class.hashCode()) |
+                    (1L << Long.class.hashCode()) |
+                    (1L << Double.class.hashCode()) |
+                    (1L << Float.class.hashCode()) |
+                    (1L << Boolean.class.hashCode()) |
+                    (1L << Character.class.hashCode()) |
+                    (1L << Byte.class.hashCode()) |
+                    (1L << Short.class.hashCode());
+
     public static boolean isPrimitive(Class<?> clazz) {
-        return clazz.isPrimitive() || Number.class.isAssignableFrom(clazz) || clazz == Character.class || clazz == String.class || clazz == Boolean.class;
+        return clazz.isPrimitive()
+                || clazz == Boolean.class || clazz == Integer.class
+                || clazz == Double.class || clazz == Float.class
+                || clazz == Character.class || clazz == Byte.class
+                || clazz == Short.class || clazz == Long.class;
     }
 
     public static boolean isChar(Class<?> clazz) {

@@ -1,4 +1,4 @@
-package dev.drtheo.autojson.bake;
+package dev.drtheo.autojson.bake.unsafe;
 
 import sun.misc.Unsafe;
 
