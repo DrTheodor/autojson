@@ -1,7 +1,5 @@
 package dev.drtheo.autojson.adapter.string.parser;
 
-import dev.drtheo.autojson.adapter.string.LazilyParsedNumber;
-
 import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
@@ -23,17 +21,21 @@ public class JsonReader {
 
     private final Deque<Boolean> objectStack = new ArrayDeque<>();
 
-    public JsonReader(String raw) throws IOException {
+    public JsonReader(String raw) {
         this.reader = new StringReader(raw);
         this.advance();
     }
 
-    private void fillBuffer() throws IOException {
-        limit = reader.read(buffer);
-        pos = 0;
+    private void fillBuffer() {
+        try {
+            limit = reader.read(buffer);
+            pos = 0;
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
-    private void advance() throws IOException {
+    private void advance() {
         if (pos == limit) {
             fillBuffer();
         }
@@ -69,7 +71,7 @@ public class JsonReader {
         return this.currentChar != -1;
     }
 
-    public Token nextToken() throws IOException {
+    public Token nextToken() {
         while (true) {
             skipWhitespace();
 
@@ -125,7 +127,7 @@ public class JsonReader {
         }
     }
 
-    private String parseString() throws IOException {
+    private String parseString() {
         consume('"'); // opening quote
         int start = pos - 1;
 
@@ -139,12 +141,12 @@ public class JsonReader {
         return result;
     }
 
-    private Object parseNull() throws IOException {
+    private Object parseNull() {
         expect("null");
         return null;
     }
 
-    private boolean parseBoolean() throws IOException {
+    private boolean parseBoolean() {
         if (currentChar == 't') {
             expect("true");
             return true;
@@ -156,7 +158,7 @@ public class JsonReader {
         throw syntaxError("Expected boolean");
     }
 
-    private void expect(String expected) throws IOException {
+    private void expect(String expected) {
         for (int i = 0; i < expected.length(); i++) {
             if (currentChar != expected.charAt(i)) {
                 throw syntaxError("Expected " + expected);
@@ -165,7 +167,7 @@ public class JsonReader {
         }
     }
 
-    private LazilyParsedNumber parseNumber() throws IOException {
+    private LazilyParsedNumber parseNumber() {
         int start = pos - 1;
 
         while ((currentChar >= '0' && currentChar <= '9') || currentChar == '.'
@@ -178,20 +180,20 @@ public class JsonReader {
         return new LazilyParsedNumber(result);
     }
 
-    private void skipWhitespace() throws IOException {
+    private void skipWhitespace() {
         while (currentChar == ' ' || currentChar == '\t' || currentChar == '\n' || currentChar == '\r') {
             advance();
         }
     }
 
-    private void consume(char c) throws IOException {
+    private void consume(char c) {
         if (this.currentChar != c)
             throw syntaxError("Expected '" + c + "', got '" + (char) this.currentChar + "'");
 
         this.advance();
     }
 
-    private void beginObject() throws IOException {
+    private void beginObject() {
         this.consume('{');
         this.expectsValue = false;
 
@@ -199,12 +201,12 @@ public class JsonReader {
         this.objectStack.push(true);
     }
 
-    private void endObject() throws IOException {
+    private void endObject() {
         this.consume('}');
         this.popStack();
     }
 
-    private void beginArray() throws IOException {
+    private void beginArray() {
         this.consume('[');
         this.expectsValue = true;
 
@@ -212,7 +214,7 @@ public class JsonReader {
         this.objectStack.push(false);
     }
 
-    private void endArray() throws IOException {
+    private void endArray() {
         this.consume(']');
         this.popStack();
     }
@@ -224,11 +226,11 @@ public class JsonReader {
         this.expectsValue = !this.isMapped;
     }
 
-    private IOException syntaxError(String message) {
-        return new IOException(message + " at line " + line + " column " + (pos - lineStart));
+    private JsonSyntaxException syntaxError(String message) {
+        return new JsonSyntaxException(message + " at line " + line + " column " + (pos - lineStart));
     }
 
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) {
         String json = "{\"name\":\"John\",\"age\":30,\"isActive\":true,\"address\":null,\"scores\":[90,85,95],\"profile\":{\"height\":180,\"weight\":75}}";
 
         JsonReader parser = new JsonReader(json);
@@ -240,7 +242,7 @@ public class JsonReader {
         System.out.println(o);
     }
 
-    private static Object deserializeObject(Map<String, Object> o, JsonReader reader) throws IOException {
+    private static Object deserializeObject(Map<String, Object> o, JsonReader reader) {
         while (reader.hasNext()) {
             Token name = reader.nextToken();
 
@@ -254,7 +256,7 @@ public class JsonReader {
         return o;
     }
 
-    private static void deserializeField(String name, Token value, Map<String, Object> o, JsonReader reader) throws IOException {
+    private static void deserializeField(String name, Token value, Map<String, Object> o, JsonReader reader) {
         Object v = switch (value.type()) {
             case BEGIN_ARRAY -> deserializeList(reader);
             case BEGIN_OBJECT -> deserializeObject(create(name), reader);
@@ -266,7 +268,7 @@ public class JsonReader {
         deserialize(o, name, v);
     }
 
-    private static List<Object> deserializeList(JsonReader reader) throws IOException {
+    private static List<Object> deserializeList(JsonReader reader) {
         List<Object> result = new ArrayList<>();
 
         while (reader.hasNext()) {

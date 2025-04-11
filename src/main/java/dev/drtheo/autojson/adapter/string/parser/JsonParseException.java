@@ -1,4 +1,4 @@
-package dev.drtheo.autojson.adapter.string;
+package dev.drtheo.autojson.adapter.string.parser;
 
 import java.io.Serial;
 

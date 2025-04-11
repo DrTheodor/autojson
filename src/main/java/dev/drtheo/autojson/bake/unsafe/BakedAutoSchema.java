@@ -2,9 +2,8 @@ package dev.drtheo.autojson.bake.unsafe;
 
 import dev.drtheo.autojson.Schema;
 import dev.drtheo.autojson.adapter.JsonAdapter;
+import dev.drtheo.autojson.adapter.JsonDeserializationContext;
 import dev.drtheo.autojson.adapter.JsonSerializationContext;
-import dev.drtheo.autojson.ast.JsonElement;
-import dev.drtheo.autojson.ast.JsonObject;
 
 import java.lang.reflect.Field;
 import java.util.HashMap;
@@ -72,29 +71,6 @@ public class BakedAutoSchema<T> implements Schema<T> {
     }
 
     @Override
-    public <To> T deserialize(JsonAdapter<Object, To> auto, JsonElement element) {
-        JsonObject object = element.getAsJsonObject();
-
-        try {
-            T t = (T) UnsafeUtil.UNSAFE.allocateInstance(this.clazz);
-
-            for (FieldType<T, ?> field : this.fields) {
-                deserialize(auto, field, t, object);
-            }
-
-            return t;
-        } catch (InstantiationException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    @Override
-    public <To> void deserialize(JsonAdapter<Object, To> auto, T t, String field, JsonElement element) {
-        FieldType<T, ?> type = this.map.get(field);
-        deserialize(auto, type, t, element);
-    }
-
-    @Override
     public T instantiate() {
         try {
             return (T) UnsafeUtil.UNSAFE.allocateInstance(this.clazz);
@@ -103,12 +79,19 @@ public class BakedAutoSchema<T> implements Schema<T> {
         }
     }
 
-    private static <T, E, To> void deserialize(JsonAdapter<Object, To> auto, FieldType<T, E> field, T t, JsonObject object) {
-        JsonElement element = object.get(field.name());
-        deserialize(auto, field, t, element);
+    @Override
+    public <To> void deserialize(JsonAdapter<Object, To> auto, JsonDeserializationContext c, T t, String field) {
+        FieldType<T, ?> type = this.map.get(field);
+
+        if (type == null && c.auto().logMissingEntries()) {
+            c.auto().log("Missing entry '" + field + "' on " + this.clazz);
+            return;
+        }
+
+        deserialize(type, t, c);
     }
 
-    private static <T, E, To> void deserialize(JsonAdapter<Object, To> auto, FieldType<T, E> field, T t, JsonElement element) {
-        field.set(t, auto.fromJson(element, field.type()));
+    private static <T, E> void deserialize(FieldType<T, E> field, T t, JsonDeserializationContext c) {
+        field.set(t, c.decode(field.type));
     }
 }

@@ -29,4 +29,16 @@ public class AutoJSON {
     public <F, T> F fromJson(JsonAdapter<F, T> adapter, T object, Class<F> clazz) {
         return adapter.fromJson(object, clazz);
     }
+
+    public boolean logMissingEntries() {
+        return true;
+    }
+
+    public void log(String message) {
+        System.out.println("[INFO] " + message);
+    }
+
+    public void warn(String message) {
+        System.err.println("[WARN] " + message);
+    }
 }

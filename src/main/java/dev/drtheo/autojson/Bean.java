@@ -1,12 +1,11 @@
 package dev.drtheo.autojson;
 
-import dev.drtheo.autojson.adapter.JsonAdapter;
-import dev.drtheo.autojson.adapter.JsonSerializationContext;
 import dev.drtheo.autojson.adapter.string.JsonStringAdapter;
-import dev.drtheo.autojson.ast.JsonElement;
+
+import java.util.Objects;
 
 public class Bean {
-    private final int primInt = Integer.MAX_VALUE;
+    private int primInt = Integer.MAX_VALUE;
     private boolean primBool = true;
     private byte primByte = Byte.MAX_VALUE;
     private char primChar = Character.MAX_VALUE;
@@ -36,33 +35,18 @@ public class Bean {
             this.namespace = namespace;
             this.path = path;
         }
+
+        @Override
+        public String toString() {
+            return "Id{" +
+                    "namespace='" + namespace + '\'' +
+                    ", path='" + path + '\'' +
+                    '}';
+        }
     }
 
     record Sound(Id id) {
 
-    }
-
-    static class IdSchema implements Schema<Id> {
-
-        @Override
-        public <To> JsonSerializationContext.Built serialize(JsonAdapter<Object, To> auto, JsonSerializationContext c, Id id) {
-            return c.primitive(id.namespace + ":" + id.path);
-        }
-
-        @Override
-        public <To> Id deserialize(JsonAdapter<Object, To> auto, JsonElement element) {
-            return null;
-        }
-
-        @Override
-        public Id instantiate() {
-            return new Id("", "");
-        }
-
-        @Override
-        public <To> void deserialize(JsonAdapter<Object, To> auto, Id id, String field, JsonElement element) {
-
-        }
     }
 
     @Override
@@ -90,6 +74,18 @@ public class Bean {
                 '}';
     }
 
+    @Override
+    public boolean equals(Object object) {
+        if (object == null || getClass() != object.getClass()) return false;
+        Bean bean = (Bean) object;
+        return primInt == bean.primInt && primBool == bean.primBool && primByte == bean.primByte && primChar == bean.primChar && primShort == bean.primShort && Double.compare(primDouble, bean.primDouble) == 0 && Float.compare(primFloat, bean.primFloat) == 0 && primLong == bean.primLong && Objects.equals(intObj, bean.intObj) && Objects.equals(boolObj, bean.boolObj) && Objects.equals(byteObj, bean.byteObj) && Objects.equals(charObj, bean.charObj) && Objects.equals(shortObj, bean.shortObj) && Objects.equals(doubleObj, bean.doubleObj) && Objects.equals(floatObj, bean.floatObj) && Objects.equals(longObj, bean.longObj) && Objects.equals(hello, bean.hello) && Objects.equals(id, bean.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(primInt, primBool, primByte, primChar, primShort, primDouble, primFloat, primLong, intObj, boolObj, byteObj, charObj, shortObj, doubleObj, floatObj, longObj, hello, id);
+    }
+
     public static void main(String[] args) {
         AutoJSON auto = new AutoJSON();
         JsonStringAdapter adapter = new JsonStringAdapter(auto);
@@ -108,8 +104,13 @@ public class Bean {
             adapter.fromJson(raw, Bean.class);
         }
 
+        System.out.println(adapter.fromJson(raw, Bean.class));
+        System.out.println(bean);
+
         for (int i = 0; i < 1_000_000; i++) {
             adapter.toJson(bean, Bean.class);
         }
+
+        System.out.println(adapter.toJson(bean, Bean.class));
     }
 }
