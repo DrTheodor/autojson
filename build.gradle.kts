@@ -42,11 +42,7 @@ publishing {
 
 task<Exec>("pushRepo") {
     val path = layout.projectDirectory.dir("../maven-repo")
-    println(path)
-    commandLine("cd", path)
-    commandLine("git", "add", ".")
-    commandLine("git", "commit", "-m", "auto")
-    commandLine("git", "push")
+    commandLine("$path/deploy.bat")
 }
 
 tasks["publishLibPublicationToGhRepository"].dependsOn("pushRepo")
