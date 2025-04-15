@@ -35,7 +35,18 @@ publishing {
     repositories {
         maven {
             name = "gh"
-            url = uri(layout.buildDirectory.dir("repo"))
+            url = uri(layout.projectDirectory.dir("../maven-repo"))
         }
     }
 }
+
+task<Exec>("pushRepo") {
+    val path = layout.projectDirectory.dir("../maven-repo")
+    println(path)
+    commandLine("cd", path)
+    commandLine("git", "add", ".")
+    commandLine("git", "commit", "-m", "auto")
+    commandLine("git", "push")
+}
+
+tasks["publishLibPublicationToGhRepository"].dependsOn("pushRepo")
