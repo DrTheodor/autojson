@@ -1,0 +1,32 @@
+package dev.drtheo.autojson.schema.bake.unsafe.adapter;
+
+import dev.drtheo.autojson.schema.bake.unsafe.ClassAdapter;
+import org.jetbrains.annotations.NotNull;
+import sun.misc.Unsafe;
+
+public class ByteClassAdapter  extends ClassAdapter.Num<Byte, byte[]> {
+
+    public ByteClassAdapter() {
+        super(Byte.class, (byte) 0);
+    }
+
+    @Override
+    public @NotNull Byte get(Unsafe unsafe, Object obj, long address) {
+        return unsafe.getByte(obj, address);
+    }
+
+    @Override
+    protected void set0(Unsafe unsafe, Object obj, long address, @NotNull Byte value) {
+        unsafe.putByte(obj, address, value);
+    }
+
+    @Override
+    protected void set0(byte[] ts, int index, @NotNull Byte value) {
+        ts[index] = value;
+    }
+
+    @Override
+    protected Byte unwrap(Number number) {
+        return number.byteValue();
+    }
+}

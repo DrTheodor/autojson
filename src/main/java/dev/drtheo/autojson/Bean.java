@@ -107,7 +107,5 @@ public class Bean {
         for (int i = 0; i < 1_000_000; i++) {
             adapter.toJson(bean, Bean.class);
         }
-
-        System.out.println(adapter.fromJson(raw, Bean.class));
     }
 }

@@ -3,8 +3,8 @@ package dev.drtheo.autojson.benchmark;
 import org.openjdk.jmh.annotations.*;
 import org.openjdk.jmh.infra.Blackhole;
 
-//@Warmup(iterations = 0)
-//@Measurement(iterations = 0)
+@Warmup(iterations = 0)
+@Measurement(iterations = 0)
 public class ToJsonBenchmarks extends AutoVsGsonBenchmark {
 
     @Benchmark

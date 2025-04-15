@@ -1,10 +1,12 @@
 package dev.drtheo.autojson.adapter.string;
 
 import dev.drtheo.autojson.AutoJSON;
-import dev.drtheo.autojson.Schema;
+import dev.drtheo.autojson.schema.Schema;
 import dev.drtheo.autojson.adapter.JsonAdapter;
 import dev.drtheo.autojson.adapter.string.parser.JsonParseException;
-import dev.drtheo.autojson.bake.unsafe.UnsafeUtil;
+import dev.drtheo.autojson.util.UnsafeUtil;
+
+import java.lang.reflect.Type;
 
 public class JsonStringAdapter implements JsonAdapter<Object, String> {
 
@@ -16,7 +18,7 @@ public class JsonStringAdapter implements JsonAdapter<Object, String> {
 
     @Override
     public <T> String toJson(T obj, Class<?> clazz) {
-        if (UnsafeUtil.isPrimitive(clazz) || clazz == String.class)
+        if (AutoJSON.isPrimitive(clazz))
             return obj.toString();
 
         JsonStringBuilder ctx = new JsonStringBuilder(this);
@@ -26,13 +28,24 @@ public class JsonStringAdapter implements JsonAdapter<Object, String> {
     }
 
     protected <T> void toJson(JsonStringBuilder ctx, T obj, Class<?> clazz) {
-        auto.schema(clazz).serialize(this, ctx, obj);
+        toJson(ctx, obj, clazz, null);
+    }
+
+    protected <T> void toJson(JsonStringBuilder ctx, T obj, Class<?> clazz, Type type) {
+        Schema<T> s = auto.schema(clazz, type);
+        try {
+            if (s != null)
+                s.serialize(this, ctx, obj);
+        } catch (Exception e) {
+            System.err.println("Failed to serialize " + s + "/" + clazz);
+            throw e;
+        }
     }
 
     @Override
     public <R> R fromJson(String object, Class<R> clazz) {
         try {
-            return JsonStringDecoder.process(this, object, clazz);
+            return JsonStringParser.process(this, object, clazz);
         } catch (JsonParseException e) {
             throw new RuntimeException(e);
         }

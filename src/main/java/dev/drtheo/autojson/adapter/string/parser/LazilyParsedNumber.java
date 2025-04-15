@@ -1,6 +1,6 @@
 package dev.drtheo.autojson.adapter.string.parser;
 
-import dev.drtheo.autojson.bake.unsafe.UnsafeUtil;
+import dev.drtheo.autojson.util.UnsafeUtil;
 
 import java.math.BigDecimal;
 

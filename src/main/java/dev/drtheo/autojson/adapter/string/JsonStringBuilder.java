@@ -2,49 +2,42 @@ package dev.drtheo.autojson.adapter.string;
 
 import dev.drtheo.autojson.AutoJSON;
 import dev.drtheo.autojson.adapter.JsonSerializationContext;
-import dev.drtheo.autojson.bake.unsafe.UnsafeUtil;
+import dev.drtheo.autojson.util.UnsafeUtil;
 
-public class JsonStringBuilder implements JsonSerializationContext, JsonSerializationContext.JsonObject, JsonSerializationContext.JsonPrimitive, JsonSerializationContext.JsonArray {
+import java.lang.reflect.Type;
+
+public class JsonStringBuilder implements JsonSerializationContext, JsonSerializationContext.Obj, JsonSerializationContext.Primitive, JsonSerializationContext.Array, JsonSerializationContext.Built {
 
     private final JsonStringAdapter adapter;
 
     private final StringBuilder builder = new StringBuilder();
     private boolean first = true;
 
-    private int depth = -1;
-    private boolean[] stack = new boolean[32];
-
-    static final boolean IS_OBJECT = true;
-    static final boolean IS_ARRAY = false;
-
     public JsonStringBuilder(JsonStringAdapter adapter) {
         this.adapter = adapter;
     }
 
-    private void comma() {
-        if (!first)
-            builder.append(",");
+    private void begin() {
+        this.first = true;
     }
 
-    @Override
-    public JsonStringBuilder put(String key, Object value) {
-        this.comma();
+    private void end() {
+        this.first = false;
+    }
+
+    private void put(String key, Object value, Type type) {
+        if (!first)
+            builder.append(",");
 
         if (key != null)
             builder.append("\"").append(key).append("\":");
 
-        this.value(value);
+        this.value(value, type);
 
         first = false;
-        return this;
     }
 
-    @Override
-    public JsonArray put(Object value) {
-        return this.put(null, value);
-    }
-
-    protected void value(Object value) {
+    protected void value(Object value, Type type) {
         if (value == null) {
             builder.append("null");
         } else if (value instanceof String || value instanceof Character) {
@@ -54,15 +47,47 @@ public class JsonStringBuilder implements JsonSerializationContext, JsonSerializ
             //noinspection UnnecessaryToStringCall
             builder.append(value.toString());
         } else {
-            this.adapter.toJson(this, value, value.getClass());
+            this.adapter.toJson(this, value, value.getClass(), type);
         }
     }
 
     @Override
-    public JsonSerializationContext.Built build() {
-        this.first = false;
+    public Array array$element(Object value, Type type) {
+        this.put(null, value, type);
+        return this;
+    }
 
-        this.builder.append(this.stack[depth--] == IS_OBJECT ? "}" : "]");
+    @Override
+    public Built array$build() {
+        this.builder.append("]");
+
+        this.end();
+        return this;
+    }
+
+    @Override
+    public Obj obj$put(String key, Object value, Type type) {
+        this.put(key, value, type);
+        return this;
+    }
+
+    @Override
+    public Built obj$build() {
+        this.builder.append("}");
+
+        this.end();
+        return this;
+    }
+
+    @Override
+    public Array primitive$value(Object value) {
+        this.value(value, null);
+        return this;
+    }
+
+    @Override
+    public Built primitive$build() {
+        this.end();
         return this;
     }
 
@@ -72,31 +97,23 @@ public class JsonStringBuilder implements JsonSerializationContext, JsonSerializ
     }
 
     @Override
-    public JsonObject object() {
+    public Obj object() {
         this.begin();
 
         this.builder.append("{");
-        this.stack[depth] = IS_OBJECT;
         return this;
     }
 
     @Override
-    public JsonArray array() {
+    public Array array() {
         this.begin();
 
         this.builder.append('[');
-        this.stack[depth] = IS_ARRAY;
         return this;
     }
 
-    private void begin() {
-        this.first = true;
-        this.depth++;
-    }
-
     @Override
-    public JsonPrimitive primitive(Object o) {
-        this.value(o);
+    public Primitive primitive() {
         return this;
     }
 

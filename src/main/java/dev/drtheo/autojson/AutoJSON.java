@@ -1,14 +1,26 @@
 package dev.drtheo.autojson;
 
 import dev.drtheo.autojson.adapter.JsonAdapter;
-import dev.drtheo.autojson.bake.unsafe.BakedAutoSchema;
+import dev.drtheo.autojson.schema.Schema;
+import dev.drtheo.autojson.schema.bake.unsafe.BakedAutoSchema;
+import dev.drtheo.autojson.schema.impl.JavaArraySchema;
+import dev.drtheo.autojson.schema.impl.JavaEnumSchema;
+import dev.drtheo.autojson.schema.impl.JavaMapSchema;
+import dev.drtheo.autojson.schema.impl.JavaSetSchema;
+import dev.drtheo.autojson.util.UnsafeUtil;
 
+import java.lang.reflect.Type;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 public class AutoJSON {
 
-    private final Map<Class<?>, BakedAutoSchema<?>> schemas = new HashMap<>();
+    public static boolean isPrimitive(Class<?> c) {
+        return UnsafeUtil.isPrimitive(c) || c == String.class;
+    }
+
+    private final Map<Class<?>, Schema<?>> schemas = new HashMap<>();
 
     private int layer = 0;
     private boolean logMisingEntries = true;
@@ -21,12 +33,39 @@ public class AutoJSON {
         this.layer = layer;
     }
 
-    public void bake(Class<?> clazz) {
-        this.schemas.put(clazz, BakedAutoSchema.bake(clazz));
+    public <T> Schema<T> schema(Class<?> clazz, Schema<T> schema) {
+        this.schemas.put(clazz, schema);
+        return schema;
     }
 
+    @SuppressWarnings("unchecked")
     public <T> Schema<T> schema(Class<?> clazz) {
-        return (Schema<T>) schemas.computeIfAbsent(clazz, BakedAutoSchema::bake);
+        return schema(clazz, (Type) null);
+    }
+
+    public <T> Schema<T> schema(Class<?> clazz, Type generic) {
+        if (isPrimitive(clazz))
+            return null;
+
+        return (Schema<T>) schemas.computeIfAbsent(clazz,
+                c -> createSchema(c, generic));
+    }
+
+    @SuppressWarnings("unchecked")
+    protected <T> Schema<T> createSchema(Class<?> clazz, Type type) {
+        if (clazz.isArray())
+            return (Schema<T>) JavaArraySchema.unwrap(clazz);
+
+        if (clazz.isEnum())
+            return (Schema<T>) JavaEnumSchema.unwrap(clazz);
+
+        if (Set.class.isAssignableFrom(clazz))
+            return (Schema<T>) new JavaSetSchema<>(type);
+
+        if (Map.class.isAssignableFrom(clazz))
+            return (Schema<T>) new JavaMapSchema<>(type);
+
+        return (Schema<T>) BakedAutoSchema.bake(this, clazz);
     }
 
     public <F, T> T toJson(JsonAdapter<F, T> adapter, Object obj) {

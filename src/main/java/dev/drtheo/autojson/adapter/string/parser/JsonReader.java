@@ -22,9 +22,12 @@ public class JsonReader {
     private int depth;
     private final Boolean[] objectStack = new Boolean[32];
 
+    private Token currentToken;
+
     public JsonReader(String raw) {
         this.reader = new StringReader(raw);
-        this.advance();
+        //this.advance();
+        //this.nextToken();
     }
 
     private void fillBuffer() {
@@ -72,7 +75,7 @@ public class JsonReader {
         return this.currentChar != -1;
     }
 
-    public Token nextToken() {
+    private Token nextToken0() {
         while (true) {
             skipWhitespace();
 
@@ -128,6 +131,16 @@ public class JsonReader {
         }
     }
 
+    public Token nextToken() {
+        Token t = this.nextToken0();
+        this.currentToken = t;
+        return t;
+    }
+
+    public Token peekToken() {
+        return currentToken;
+    }
+
     private String parseString() {
         consume('"'); // opening quote
         int start = pos - 1;
@@ -170,14 +183,16 @@ public class JsonReader {
 
     private LazilyParsedNumber parseNumber() {
         int start = pos - 1;
+        int len = 0;
 
         while ((currentChar >= '0' && currentChar <= '9') || currentChar == '.'
                 || currentChar == 'e' || currentChar == 'E'
                 || currentChar == '+' || currentChar == '-') {
             advance();
+            len++;
         }
 
-        String result = new String(buffer, start, pos - 1 - start);
+        String result = new String(buffer, start, len);
         return new LazilyParsedNumber(result);
     }
 
@@ -215,7 +230,8 @@ public class JsonReader {
 
         this.isMapped = false;
 
-        this.objectStack[this.depth++] = false;
+        this.depth++;
+        this.objectStack[this.depth] = false;
     }
 
     private void endArray() {
@@ -242,8 +258,6 @@ public class JsonReader {
 
         parser.beginObject();
         deserializeObject(o, parser);
-
-        System.out.println(o);
     }
 
     private static Object deserializeObject(Map<String, Object> o, JsonReader reader) {
