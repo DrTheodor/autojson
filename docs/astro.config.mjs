@@ -15,12 +15,12 @@ export default defineConfig({
 					label: 'Guides',
 					items: [
 						// Each item here is one entry in the navigation menu.
-						{ label: 'Example Guide', slug: 'autojson/guides/example' },
+						{ label: 'Example Guide', slug: 'guides/example' },
 					],
 				},
 				{
 					label: 'Reference',
-					autogenerate: { directory: 'autojson/reference' },
+					autogenerate: { directory: 'reference' },
 				},
 			],
 			editLink: {
