@@ -1,10 +1,11 @@
 plugins {
     id("java")
     id("me.champeau.jmh") version "0.7.2"
+    id("maven-publish")
 }
 
 group = "dev.drtheo"
-version = "1.0-SNAPSHOT"
+version = "1.0.0"
 
 repositories {
     mavenCentral()
@@ -22,4 +23,19 @@ dependencies {
 
 tasks.test {
     useJUnitPlatform()
+}
+
+publishing {
+    publications {
+        create<MavenPublication>("lib") {
+            from(components["java"])
+        }
+    }
+
+    repositories {
+        maven {
+            name = "gh"
+            url = uri(layout.buildDirectory.dir("repo"))
+        }
+    }
 }
