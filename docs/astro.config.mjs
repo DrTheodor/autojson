@@ -15,16 +15,16 @@ export default defineConfig({
 					label: 'Guides',
 					items: [
 						// Each item here is one entry in the navigation menu.
-						{ label: 'Example Guide', slug: 'guides/example' },
+						{ label: 'Example Guide', slug: 'autojson/guides/example' },
 					],
 				},
 				{
 					label: 'Reference',
-					autogenerate: { directory: 'reference' },
+					autogenerate: { directory: 'autojson/reference' },
 				},
 			],
 			editLink: {
-				baseUrl: 'https://github.com/withastro/starlight/edit/main/docs/'
+				baseUrl: 'https://github.com/DrTheodor/autojson/edit/main/docs/'
 			}
 		}),
 	],
