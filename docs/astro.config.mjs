@@ -5,7 +5,7 @@ import starlight from '@astrojs/starlight';
 // https://astro.build/config
 export default defineConfig({
 	site: 'https://theo.is-a.dev',
-	//base: '/autojson',
+	base: '/autojson',
 	integrations: [
 		starlight({
 			title: 'AutoJSON',
