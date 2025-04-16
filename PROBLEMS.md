@@ -1,3 +1,29 @@
+
+## 16.04.25
+Ok so some thinking about it
+
+If we take into account generics...
+
+```java
+import java.lang.reflect.Type;
+import java.util.function.Supplier;
+
+public interface JsonDeserializationContext extends JsonContext {
+    <T> T decode(@NonNull Class<T> clazz, @Nullable Type type);
+    <T> T decode(@NonNull Class<T> clazz, @Nullable Type type, Schema<T> schema);
+}
+```
+
+If the schema is supplied, then it should be also taking `PrimitiveSchema`s into account.
+
+---
+
+Actually, yk what? `Type`s are also `Class<?>`s!
+
+---
+
+Nevermind. (?) or not? fuck
+
 ## 15.04.25
 AAAAAAAAAAAAAAAAAAAAAAAAAAHHHHHHHHHHHHHHHHH
 ok so everything works. quite fast compared to gson too

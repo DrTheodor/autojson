@@ -1,10 +1,15 @@
 package dev.drtheo.autojson.adapter;
 
 import dev.drtheo.autojson.schema.Schema;
+import org.jetbrains.annotations.NotNull;
 
-import java.util.function.Supplier;
+import java.lang.reflect.Type;
 
 public interface JsonDeserializationContext extends JsonContext {
-    <T> T decode(Class<T> clazz);
-    <T> T decode(Class<T> clazz, Supplier<Schema<T>> schema);
+
+    default <T> T decode(Type type) {
+        return decode(type, null);
+    }
+
+    <T> T decode(Type type, Schema<T> schema);
 }

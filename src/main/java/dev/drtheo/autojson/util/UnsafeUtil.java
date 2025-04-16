@@ -3,6 +3,7 @@ package dev.drtheo.autojson.util;
 import sun.misc.Unsafe;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Type;
 
 public class UnsafeUtil {
 
@@ -18,7 +19,10 @@ public class UnsafeUtil {
         }
     }
 
-    public static boolean isPrimitive(Class<?> clazz) {
+    public static boolean isPrimitive(Type type) {
+        if (!(type instanceof Class<?> clazz))
+            return false;
+
         return clazz.isPrimitive()
                 || clazz == Boolean.class || clazz == Integer.class
                 || clazz == Double.class || clazz == Float.class

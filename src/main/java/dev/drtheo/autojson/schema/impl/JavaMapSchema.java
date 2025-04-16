@@ -15,12 +15,8 @@ public class JavaMapSchema<T> implements ObjectSchema<Map<String, T>> {
 
     private final Class<T> value;
 
-    public JavaMapSchema(Type mapClass) {
-        if (!(mapClass instanceof ParameterizedType type))
-            throw new IllegalArgumentException("Not a parameterized type");
-
-        Type[] typeArguments = type.getActualTypeArguments();
-        this.value = (Class<T>) typeArguments[1];
+    public JavaMapSchema(ParameterizedType type) {
+        this.value = (Class<T>) type.getActualTypeArguments()[1];
     }
 
     @Override

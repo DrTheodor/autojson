@@ -15,7 +15,7 @@ public interface JsonSerializationContext extends JsonContext {
 
     interface Obj {
         default Obj obj$put(String key, Object value) {
-            return obj$put(key, value, null);
+            return obj$put(key, value, value.getClass());
         }
 
         Obj obj$put(String key, Object value, Type type);
@@ -24,7 +24,7 @@ public interface JsonSerializationContext extends JsonContext {
 
     interface Array {
         default Array array$element(Object value) {
-            return array$element(value, null);
+            return array$element(value, value.getClass());
         }
 
         Array array$element(Object value, Type type);

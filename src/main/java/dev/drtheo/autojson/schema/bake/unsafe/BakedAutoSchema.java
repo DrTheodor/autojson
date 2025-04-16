@@ -57,7 +57,7 @@ public class BakedAutoSchema<T> implements ObjectSchema<T> {
         return new BakedAutoSchema<>(clazz, types, map, safeInstance);
     }
 
-    record FieldType<T, E>(Class<E> type, Type generic, ClassAdapter<E, E[]> adapter, String name, long offset, Schema<E> schema) {
+    record FieldType<T, E>(Type type, ClassAdapter<E, E[]> adapter, String name, long offset, Schema<E> schema) {
 
         public static <T, E> FieldType<T, E> from(AutoJSON auto, Field field) {
             Class<E> type = (Class<E>) field.getType();
@@ -73,7 +73,7 @@ public class BakedAutoSchema<T> implements ObjectSchema<T> {
 //                                (Class<? extends E>) hint.value(), true)
 //                );
 
-            return new FieldType<>(type, field.getGenericType(), adapter,
+            return new FieldType<>(field.getGenericType(), adapter,
                     field.getName(), UnsafeUtil.UNSAFE.objectFieldOffset(field), schema);
         }
 
@@ -89,7 +89,7 @@ public class BakedAutoSchema<T> implements ObjectSchema<T> {
             if (this.schema != null)
                 return this.schema;
 
-            return auto.schema(type, generic);
+            return auto.schema(type);
         }
     }
 
@@ -117,11 +117,11 @@ public class BakedAutoSchema<T> implements ObjectSchema<T> {
 
     @Override
     public <To> void serialize(JsonAdapter<Object, To> auto, JsonSerializationContext.Obj c, T t) {
-        for (FieldType<T, ?> type : this.fields) {
-            if (type == null)
+        for (FieldType<T, ?> field : this.fields) {
+            if (field == null)
                 continue;
 
-            c.obj$put(type.name(), type.get(t), type.generic());
+            c.obj$put(field.name(), field.get(t), field.type());
         }
     }
 
@@ -145,7 +145,7 @@ public class BakedAutoSchema<T> implements ObjectSchema<T> {
     }
 
     private static <T, E> void deserialize(FieldType<T, E> field, T t, JsonDeserializationContext c) {
-        E e = c.decode(field.type(), () -> field.schema(c.auto()));
+        E e = c.decode(field.type(), field.schema(c.auto()));
         field.set(t, e);
     }
 }

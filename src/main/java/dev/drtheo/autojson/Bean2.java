@@ -16,24 +16,23 @@ public class Bean2 {
         add("str6");
     }};
 
-//    final Set<String> strSet = new HashSet<>() {{
-//        add("str1");
-//        add("str2");
-//        add("str3");
-//    }};
+    final Set<String> strSet = new HashSet<>() {{
+        add("str1");
+        add("str2");
+        add("str3");
+    }};
 
 
     @Override
     public String toString() {
         StringBuilder builder = new StringBuilder();
-        builder.append("Bean2{\n").append("\tstrArray=[");
+        builder.append("Bean2{\n").append("\tstrArray=");
 
-        for (String s : strArray) {
-            System.out.println(s);
-//            builder.append(s).append(",");
-        }
+        builder.append(Arrays.toString(strArray));
 
-        return builder.append("], strList=").append(strList).append("}").toString();
+        return builder.append(",\n\tstrList=").append(strList)
+                .append(",\n\tstrSet=").append(strSet)
+                .append("\n}").toString();
     }
 
     public static void main(String[] args) {
@@ -43,7 +42,9 @@ public class Bean2 {
         JsonStringAdapter adapter = new JsonStringAdapter(auto);
 
         System.out.println(adapter.toJson(bean));
-        System.out.println(adapter.fromJson("{\"strArray\":[\"str1\",\"str2\",\"str3\"],\"strList\":[\"str4\",\"str5\",\"str6\"]}", Bean2.class));
+
+        Bean2 b = adapter.fromJson("{\"strArray\":[\"str1\",\"str2\",\"str3\"],\"strList\":[\"str4\",\"str5\",\"str6\"],\"strSet\":[\"str7\", \"str8\",\"str9\"]}", Bean2.class);
+        System.out.println(b);
 
     }
 }

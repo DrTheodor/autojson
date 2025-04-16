@@ -3,24 +3,23 @@ package dev.drtheo.autojson;
 import dev.drtheo.autojson.adapter.JsonAdapter;
 import dev.drtheo.autojson.schema.Schema;
 import dev.drtheo.autojson.schema.bake.unsafe.BakedAutoSchema;
-import dev.drtheo.autojson.schema.impl.JavaArraySchema;
-import dev.drtheo.autojson.schema.impl.JavaEnumSchema;
-import dev.drtheo.autojson.schema.impl.JavaMapSchema;
-import dev.drtheo.autojson.schema.impl.JavaSetSchema;
+import dev.drtheo.autojson.schema.impl.*;
 import dev.drtheo.autojson.util.UnsafeUtil;
 
+import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-public class AutoJSON {
+public class AutoJSON implements SchemaHolder {
 
-    public static boolean isPrimitive(Class<?> c) {
-        return UnsafeUtil.isPrimitive(c) || c == String.class;
+    public static boolean isPrimitive(Type type) {
+        return UnsafeUtil.isPrimitive(type) || type == String.class;
     }
 
-    private final Map<Class<?>, Schema<?>> schemas = new HashMap<>();
+    private final Map<Type, Schema<?>> schemas = new HashMap<>();
 
     private int layer = 0;
     private boolean logMisingEntries = true;
@@ -33,39 +32,46 @@ public class AutoJSON {
         this.layer = layer;
     }
 
-    public <T> Schema<T> schema(Class<?> clazz, Schema<T> schema) {
-        this.schemas.put(clazz, schema);
+    public <T> Schema<T> schema(Type type, Schema<T> schema) {
+        this.schemas.put(type, schema);
         return schema;
     }
 
-    @SuppressWarnings("unchecked")
-    public <T> Schema<T> schema(Class<?> clazz) {
-        return schema(clazz, (Type) null);
-    }
-
-    public <T> Schema<T> schema(Class<?> clazz, Type generic) {
-        if (isPrimitive(clazz))
+    @Override
+    public <T> Schema<T> schema(Type type) {
+        if (type == null)
             return null;
 
-        return (Schema<T>) schemas.computeIfAbsent(clazz,
-                c -> createSchema(c, generic));
+        if (isPrimitive(type))
+            return null;
+
+        return (Schema<T>) schemas.computeIfAbsent(type, this::createSchema);
     }
 
     @SuppressWarnings("unchecked")
-    protected <T> Schema<T> createSchema(Class<?> clazz, Type type) {
-        if (clazz.isArray())
-            return (Schema<T>) JavaArraySchema.unwrap(clazz);
+    protected <T> Schema<T> createSchema(Type type) {
+        if (type instanceof Class<?> clazz) {
+            if (clazz.isArray())
+                return (Schema<T>) JavaArraySchema.unwrap(this, clazz);
 
-        if (clazz.isEnum())
-            return (Schema<T>) JavaEnumSchema.unwrap(clazz);
+            if (clazz.isEnum())
+                return (Schema<T>) JavaEnumSchema.unwrap(clazz);
 
-        if (Set.class.isAssignableFrom(clazz))
-            return (Schema<T>) new JavaSetSchema<>(type);
+            return (Schema<T>) BakedAutoSchema.bake(this, clazz);
+        }
 
-        if (Map.class.isAssignableFrom(clazz))
-            return (Schema<T>) new JavaMapSchema<>(type);
+        if (type instanceof ParameterizedType parameterized) {
+            if (parameterized.getRawType() == Set.class)
+                return (Schema<T>) new JavaSetSchema<>(parameterized);
 
-        return (Schema<T>) BakedAutoSchema.bake(this, clazz);
+            if (parameterized.getRawType() == Map.class)
+                return (Schema<T>) new JavaMapSchema<>(parameterized);
+
+            if (parameterized.getRawType() == List.class)
+                return (Schema<T>) new JavaListSchema<>(this, parameterized);
+        }
+
+        throw new IllegalArgumentException("Can't handle type " + type);
     }
 
     public <F, T> T toJson(JsonAdapter<F, T> adapter, Object obj) {

@@ -47,7 +47,7 @@ public class JsonStringBuilder implements JsonSerializationContext, JsonSerializ
             //noinspection UnnecessaryToStringCall
             builder.append(value.toString());
         } else {
-            this.adapter.toJson(this, value, value.getClass(), type);
+            this.adapter.toJson(this, value, type);
         }
     }
 
