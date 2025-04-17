@@ -45,4 +45,4 @@ task<Exec>("pushRepo") {
     commandLine("$path/deploy.bat")
 }
 
-tasks["publishLibPublicationToGhRepository"].dependsOn("pushRepo")
+tasks["publishLibPublicationToGhRepository"].finalizedBy("pushRepo")
