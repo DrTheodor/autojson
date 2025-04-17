@@ -28,7 +28,7 @@ public class BakedAutoSchema<T> implements ObjectSchema<T> {
             return null;
 
         Instantiate options = clazz.getAnnotation(Instantiate.class);
-        boolean safeInstance = false;
+        boolean safeInstance = auto.safeInstancing(clazz);
 
         if (options != null)
             safeInstance = options.safe();

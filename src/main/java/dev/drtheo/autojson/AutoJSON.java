@@ -25,9 +25,18 @@ public class AutoJSON implements SchemaHolder {
 
     private int layer = 0;
     private boolean logMisingEntries = true;
+    private boolean safeInstancing = false;
 
     public void setLogMisingEntries(boolean logMisingEntries) {
         this.logMisingEntries = logMisingEntries;
+    }
+
+    public void setSafeInstancing(boolean safeInstancing) {
+        this.safeInstancing = safeInstancing;
+    }
+
+    public boolean safeInstancing(Class<?> type) {
+        return safeInstancing;
     }
 
     public void setLayer(int layer) {
