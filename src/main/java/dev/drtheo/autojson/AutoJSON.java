@@ -51,7 +51,7 @@ public class AutoJSON implements SchemaHolder {
         return layer == -1 || (this.layer & layer) == 0;
     }
 
-    public void template(Class<?> type, TemplateCreator<?> func) {
+    public <T> void template(Class<? super T> type, TemplateCreator<T> func) {
         templates.put(type, func);
     }
 
@@ -87,7 +87,7 @@ public class AutoJSON implements SchemaHolder {
             if (parameterized.getRawType() == Set.class)
                 return (Schema<T>) new JavaSetSchema<>(this, parameterized);
 
-            if (parameterized.getRawType() == Map.class)
+            if (parameterized.getRawType() == Map.class && parameterized.getActualTypeArguments()[0] == String.class)
                 return (Schema<T>) new JavaMapSchema<>(this, parameterized);
 
             if (parameterized.getRawType() == List.class)
