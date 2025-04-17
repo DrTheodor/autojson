@@ -117,6 +117,11 @@ public class JsonStringParser implements JsonDeserializationContext {
     }
 
     @Override
+    public <T> Schema<T> schema(Type type) {
+        return adapter.schema(type);
+    }
+
+    @Override
     public <T> T decode(Type type) {
         return decode(type, this.adapter.schema(type));
     }

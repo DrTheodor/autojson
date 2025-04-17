@@ -1,5 +1,6 @@
 package dev.drtheo.autojson.adapter;
 
+import dev.drtheo.autojson.schema.PrimitiveSchema;
 import dev.drtheo.autojson.schema.Schema;
 
 import java.lang.reflect.Type;
@@ -12,31 +13,48 @@ public interface JsonSerializationContext extends JsonContext {
 
     interface Built { }
 
-    interface Obj {
+    interface Obj extends JsonContext {
         default Obj obj$put(String key, Object value) {
             return obj$put(key, value, value.getClass());
         }
 
-        Obj obj$put(String key, Object value, Type type);
+        default Obj obj$put(String key, Object value, Type type) {
+            return obj$put(key, value, type, schema(type));
+        }
 
         <T> Obj obj$put(String key, T value, Type type, Schema<T> schema);
 
         Built obj$build();
     }
 
-    interface Array {
+    interface Array extends JsonContext {
         default Array array$element(Object value) {
             return array$element(value, value.getClass());
         }
 
-        Array array$element(Object value, Type type);
+        default Array array$element(Object value, Type type) {
+            return array$element(value, type, schema(type));
+        }
 
         <T> Array array$element(T value, Type type, Schema<T> schema);
         Built array$build();
     }
 
-    interface Primitive {
-        void primitive$value(Object value);
+    interface Primitive extends JsonContext {
+        default void primitive$value(Object value) {
+            primitive$value(value, value.getClass());
+        }
+
+        default <T> void primitive$value(T value, Type type) {
+            Schema<T> schema = schema(type);
+
+            if (!(schema instanceof PrimitiveSchema<T> ps))
+                throw new IllegalArgumentException("Schema " + schema + " is not a primitive schema");
+
+            primitive$value(value, type, ps);
+        }
+
+        <T> void primitive$value(T value, Type type, PrimitiveSchema<T> schema);
         Built primitive$build();
     }
 }

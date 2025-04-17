@@ -2,6 +2,7 @@ package dev.drtheo.autojson.adapter.string;
 
 import dev.drtheo.autojson.AutoJSON;
 import dev.drtheo.autojson.adapter.JsonSerializationContext;
+import dev.drtheo.autojson.schema.PrimitiveSchema;
 import dev.drtheo.autojson.schema.Schema;
 import dev.drtheo.autojson.util.UnsafeUtil;
 import org.jetbrains.annotations.Nullable;
@@ -54,11 +55,6 @@ public class JsonStringBuilder implements JsonSerializationContext, JsonSerializ
     }
 
     @Override
-    public Array array$element(Object value, Type type) {
-        return array$element(value, type, adapter.schema(type));
-    }
-
-    @Override
     public <T> Array array$element(T value, Type type, Schema<T> s) {
         this.put(null, value, type, s);
         return this;
@@ -70,11 +66,6 @@ public class JsonStringBuilder implements JsonSerializationContext, JsonSerializ
 
         this.end();
         return this;
-    }
-
-    @Override
-    public Obj obj$put(String key, Object value, Type type) {
-        return obj$put(key, value, type, adapter.schema(type));
     }
 
     @Override
@@ -92,8 +83,8 @@ public class JsonStringBuilder implements JsonSerializationContext, JsonSerializ
     }
 
     @Override
-    public void primitive$value(Object value) {
-        this.value(value, null, null);
+    public <T> void primitive$value(T value, Type type, PrimitiveSchema<T> schema) {
+        this.value(value, type, schema);
     }
 
     @Override
@@ -131,5 +122,10 @@ public class JsonStringBuilder implements JsonSerializationContext, JsonSerializ
     @Override
     public AutoJSON auto() {
         return this.adapter.auto;
+    }
+
+    @Override
+    public <T> Schema<T> schema(Type type) {
+        return adapter.schema(type);
     }
 }
