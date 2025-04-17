@@ -34,6 +34,14 @@ public class AutoJSON implements SchemaHolder {
         this.layer = layer;
     }
 
+    public int getLayer() {
+        return layer;
+    }
+
+    public boolean shouldExclude(int layer) {
+        return layer == -1 || (this.layer & layer) == 0;
+    }
+
     public void template(Class<?> type, TemplateCreator<?> func) {
         templates.put(type, func);
     }
@@ -95,10 +103,6 @@ public class AutoJSON implements SchemaHolder {
 
     public <F, T> F fromJson(JsonAdapter<F, T> adapter, T object, Class<F> clazz) {
         return adapter.fromJson(object, clazz);
-    }
-
-    public int layer() {
-        return layer;
     }
 
     public boolean logMissingEntries() {
