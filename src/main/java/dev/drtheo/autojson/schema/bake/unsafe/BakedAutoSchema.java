@@ -59,7 +59,7 @@ public class BakedAutoSchema<T> implements ObjectSchema<T> {
         return new BakedAutoSchema<>(clazz, types, map, safeInstance);
     }
 
-    record FieldType<T, E>(Type type, ClassAdapter<E, E[]> adapter, String name, long offset, Lazy<Schema<E>> schema) {
+    public record FieldType<T, E>(Type type, ClassAdapter<E, E[]> adapter, String name, long offset, Lazy<Schema<E>> schema) {
 
         public static <T, E> FieldType<T, E> from(SchemaHolder holder, Field field) {
             Type type = field.getGenericType();
