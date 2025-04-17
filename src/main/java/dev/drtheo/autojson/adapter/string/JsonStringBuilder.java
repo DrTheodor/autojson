@@ -92,9 +92,8 @@ public class JsonStringBuilder implements JsonSerializationContext, JsonSerializ
     }
 
     @Override
-    public Array primitive$value(Object value) {
+    public void primitive$value(Object value) {
         this.value(value, null, null);
-        return this;
     }
 
     @Override
