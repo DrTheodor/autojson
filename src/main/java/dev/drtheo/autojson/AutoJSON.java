@@ -34,7 +34,7 @@ public class AutoJSON implements SchemaHolder {
         this.layer = layer;
     }
 
-    public <T> void template(Class<T> type, TemplateCreator<T> func) {
+    public void template(Class<?> type, TemplateCreator<?> func) {
         templates.put(type, func);
     }
 
