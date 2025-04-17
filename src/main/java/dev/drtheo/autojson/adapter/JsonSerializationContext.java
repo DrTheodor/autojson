@@ -48,10 +48,10 @@ public interface JsonSerializationContext extends JsonContext {
         default <T> void primitive$value(T value, Type type) {
             Schema<T> schema = schema(type);
 
-            if (!(schema instanceof PrimitiveSchema<T> ps))
+            if (schema != null && !(schema instanceof PrimitiveSchema<T>))
                 throw new IllegalArgumentException("Schema " + schema + " is not a primitive schema");
 
-            primitive$value(value, type, ps);
+            primitive$value(value, type, (PrimitiveSchema<T>) schema);
         }
 
         <T> void primitive$value(T value, Type type, PrimitiveSchema<T> schema);
