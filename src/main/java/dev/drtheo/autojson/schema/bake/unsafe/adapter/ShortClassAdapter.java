@@ -16,6 +16,16 @@ public class ShortClassAdapter extends ClassAdapter.Num<Short, short[]> {
     }
 
     @Override
+    public int getLength(short[] ts) {
+        return ts.length;
+    }
+
+    @Override
+    public Short get(short[] ts, int index) {
+        return ts[index];
+    }
+
+    @Override
     protected void set0(Unsafe unsafe, Object obj, long address, @NotNull Short value) {
         unsafe.putShort(obj, address, value);
     }

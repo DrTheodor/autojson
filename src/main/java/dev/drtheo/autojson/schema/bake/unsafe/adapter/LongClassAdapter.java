@@ -16,6 +16,16 @@ public class LongClassAdapter extends ClassAdapter.Num<Long, long[]> {
     }
 
     @Override
+    public int getLength(long[] ts) {
+        return ts.length;
+    }
+
+    @Override
+    public Long get(long[] ts, int index) {
+        return ts[index];
+    }
+
+    @Override
     protected void set0(Unsafe unsafe, Object obj, long address, @NotNull Long value) {
         unsafe.putLong(obj, address, value);
     }

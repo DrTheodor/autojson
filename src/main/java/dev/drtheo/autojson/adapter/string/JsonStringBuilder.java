@@ -2,7 +2,9 @@ package dev.drtheo.autojson.adapter.string;
 
 import dev.drtheo.autojson.AutoJSON;
 import dev.drtheo.autojson.adapter.JsonSerializationContext;
+import dev.drtheo.autojson.schema.Schema;
 import dev.drtheo.autojson.util.UnsafeUtil;
+import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.Type;
 
@@ -25,19 +27,19 @@ public class JsonStringBuilder implements JsonSerializationContext, JsonSerializ
         this.first = false;
     }
 
-    private void put(String key, Object value, Type type) {
+    private <T> void put(String key, T value, Type type, @Nullable Schema<T> s) {
         if (!first)
             builder.append(",");
 
         if (key != null)
             builder.append("\"").append(key).append("\":");
 
-        this.value(value, type);
+        this.value(value, type, s);
 
         first = false;
     }
 
-    protected void value(Object value, Type type) {
+    protected <T> void value(T value, Type type, Schema<T> s) {
         if (value == null) {
             builder.append("null");
         } else if (value instanceof String || value instanceof Character) {
@@ -47,13 +49,18 @@ public class JsonStringBuilder implements JsonSerializationContext, JsonSerializ
             //noinspection UnnecessaryToStringCall
             builder.append(value.toString());
         } else {
-            this.adapter.toJson(this, value, type);
+            this.adapter.toJson(this, value, type, s);
         }
     }
 
     @Override
     public Array array$element(Object value, Type type) {
-        this.put(null, value, type);
+        return array$element(value, type, adapter.schema(type));
+    }
+
+    @Override
+    public <T> Array array$element(T value, Type type, Schema<T> s) {
+        this.put(null, value, type, s);
         return this;
     }
 
@@ -67,7 +74,12 @@ public class JsonStringBuilder implements JsonSerializationContext, JsonSerializ
 
     @Override
     public Obj obj$put(String key, Object value, Type type) {
-        this.put(key, value, type);
+        return obj$put(key, value, type, adapter.schema(type));
+    }
+
+    @Override
+    public <T> Obj obj$put(String key, T value, Type type, Schema<T> s) {
+        this.put(key, value, type, s);
         return this;
     }
 
@@ -81,7 +93,7 @@ public class JsonStringBuilder implements JsonSerializationContext, JsonSerializ
 
     @Override
     public Array primitive$value(Object value) {
-        this.value(value, null);
+        this.value(value, null, null);
         return this;
     }
 

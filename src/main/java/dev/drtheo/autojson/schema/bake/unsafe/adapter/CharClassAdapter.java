@@ -21,6 +21,16 @@ public class CharClassAdapter extends ClassAdapter.Wrapped<Character, char[], St
     }
 
     @Override
+    public int getLength(char[] ts) {
+        return ts.length;
+    }
+
+    @Override
+    public Character get(char[] ts, int index) {
+        return ts[index];
+    }
+
+    @Override
     protected void set0(Unsafe unsafe, Object obj, long address, @NotNull Character value) {
         unsafe.putChar(obj, address, value);
     }

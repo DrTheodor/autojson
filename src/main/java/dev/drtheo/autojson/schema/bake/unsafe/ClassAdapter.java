@@ -4,50 +4,63 @@ import dev.drtheo.autojson.schema.bake.unsafe.adapter.*;
 import org.jetbrains.annotations.NotNull;
 import sun.misc.Unsafe;
 
+import java.lang.reflect.Type;
+
 public interface ClassAdapter<T, Array> {
 
     T get(Unsafe unsafe, Object obj, long address);
     void set(Unsafe unsafe, Object obj, long address, T value);
 
+    @SuppressWarnings("unchecked")
     default Array castArray(Object o) {
         return (Array) o;
     }
 
     default void setArray(Object obj, int index, T value) {
-        set((Array) obj, index, value);
+        set(castArray(obj), index, value);
+    }
+
+    default int getArrayLength(Object obj) {
+        return getLength(castArray(obj));
+    }
+
+    default T getArray(Object obj, int index) {
+        return get(castArray(obj), index);
     }
 
     void set(Array ts, int index, T value);
+    int getLength(Array ts);
+    T get(Array ts, int index);
 
-    static ClassAdapter<?, ?> match(Class<?> clazz) {
-        if (!clazz.isPrimitive())
+    static ClassAdapter<?, ?> match(Type type) {
+        if (!(type instanceof Class<?> c) || !c.isPrimitive())
             return OBJECT;
 
-        if (clazz == Boolean.TYPE)
+        if (c == Boolean.TYPE)
             return BOOL;
 
-        if (clazz == Byte.TYPE)
+        if (c == Byte.TYPE)
             return BYTE;
 
-        if (clazz == Short.TYPE)
+        if (c == Short.TYPE)
             return SHORT;
 
-        if (clazz == Character.TYPE)
+        if (c == Character.TYPE)
             return CHAR;
 
-        if (clazz == Integer.TYPE)
+        if (c == Integer.TYPE)
             return INT;
 
-        if (clazz == Float.TYPE)
+        if (c == Float.TYPE)
             return FLOAT;
 
-        if (clazz == Double.TYPE)
+        if (c == Double.TYPE)
             return DOUBLE;
 
-        if (clazz == Long.TYPE)
+        if (c == Long.TYPE)
             return LONG;
 
-        return OBJECT;
+        throw new IllegalArgumentException("Unsupported primitive type: " + type);
     }
 
     abstract class Primitive<T, Array> implements ClassAdapter<T, Array> {

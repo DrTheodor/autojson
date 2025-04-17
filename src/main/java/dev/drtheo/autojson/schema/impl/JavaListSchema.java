@@ -11,7 +11,7 @@ import java.lang.reflect.ParameterizedType;
 import java.util.ArrayList;
 import java.util.List;
 
-public class JavaListSchema<T> implements ArraySchema<List<T>> {
+public class JavaListSchema<T> implements ArraySchema<List<T>, List<T>> {
 
     private final Class<T> type;
     private final Schema<T> schema;
@@ -26,18 +26,18 @@ public class JavaListSchema<T> implements ArraySchema<List<T>> {
         for (T t : ts) {
             // FIXME(perf): we already have the schema cached
             //  so why bother querying it again in the impl?
-            c.array$element(t, this.type);
+            c.array$element(t, this.type, this.schema);
         }
     }
 
     @Override
-    public Object instantiate() {
+    public List<T> instantiate() {
         return new ArrayList<>();
     }
 
     @Override
-    public <To> Object deserialize(JsonAdapter<Object, To> auto, JsonDeserializationContext c, Object o, int index) {
-        ((List<T>) o).add(index, c.decode(this.type, this.schema));
+    public <To> List<T> deserialize(JsonAdapter<Object, To> auto, JsonDeserializationContext c, List<T> o, int index) {
+        o.add(index, c.decode(this.type, this.schema));
         return o;
     }
 }

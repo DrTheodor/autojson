@@ -1,7 +1,11 @@
 package dev.drtheo.autojson;
 
+import com.google.gson.Gson;
 import dev.drtheo.autojson.adapter.string.JsonStringAdapter;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Objects;
 
 public class Bean {
@@ -13,6 +17,19 @@ public class Bean {
     private double primDouble = Double.MAX_VALUE;
     private float primFloat = Float.MAX_VALUE;
     private long primLong = Long.MAX_VALUE;
+
+    private int[] intArr = new int[] {
+            1, 2, 3, 4, 5, 6, 7, 8, 9, 0
+    };
+
+    private String[] strArr = new String[]{
+            "hippity", "hoppity"
+    };
+
+    private List<String> strList = new ArrayList<>() {{
+        add("never gonna give you up");
+        add("never gonna let you down");
+    }};
 
     private Integer intObj = Integer.MAX_VALUE;
     private Boolean boolObj = true;
@@ -60,6 +77,9 @@ public class Bean {
                 ", primDouble=" + primDouble +
                 ", primFloat=" + primFloat +
                 ", primLong=" + primLong +
+                ", intArr=" + Arrays.toString(intArr) +
+                ", strArr=" + Arrays.toString(strArr) +
+                ", strList=" + strList +
                 ", intObj=" + intObj +
                 ", boolObj=" + boolObj +
                 ", byteObj=" + byteObj +
@@ -70,7 +90,6 @@ public class Bean {
                 ", longObj=" + longObj +
                 ", hello='" + hello + '\'' +
                 ", id=" + id +
-                //", sound=" + sound +
                 '}';
     }
 
@@ -106,6 +125,16 @@ public class Bean {
 
         for (int i = 0; i < 1_000_000; i++) {
             adapter.toJson(bean, Bean.class);
+        }
+
+        Gson gson = new Gson();
+
+        for (int i = 0; i < 1_000_000; i++) {
+            gson.fromJson(raw, Bean.class);
+        }
+
+        for (int i = 0; i < 1_000_000; i++) {
+            gson.toJson(bean, Bean.class);
         }
     }
 }

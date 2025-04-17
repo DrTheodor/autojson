@@ -4,7 +4,7 @@ import dev.drtheo.autojson.schema.bake.unsafe.ClassAdapter;
 import org.jetbrains.annotations.NotNull;
 import sun.misc.Unsafe;
 
-public class FloatClassAdapter  extends ClassAdapter.Num<Float, float[]> {
+public class FloatClassAdapter extends ClassAdapter.Num<Float, float[]> {
 
     public FloatClassAdapter() {
         super(Float.class, 0f);
@@ -13,6 +13,16 @@ public class FloatClassAdapter  extends ClassAdapter.Num<Float, float[]> {
     @Override
     public @NotNull Float get(Unsafe unsafe, Object obj, long address) {
         return unsafe.getFloat(obj, address);
+    }
+
+    @Override
+    public int getLength(float[] ts) {
+        return ts.length;
+    }
+
+    @Override
+    public Float get(float[] ts, int index) {
+        return ts[index];
     }
 
     @Override

@@ -16,6 +16,16 @@ public class DoubleClassAdapter extends ClassAdapter.Num<Double, double[]> {
     }
 
     @Override
+    public int getLength(double[] ts) {
+        return ts.length;
+    }
+
+    @Override
+    public Double get(double[] ts, int index) {
+        return ts[index];
+    }
+
+    @Override
     protected void set0(Unsafe unsafe, Object obj, long address, @NotNull Double value) {
         unsafe.putDouble(obj, address, value);
     }

@@ -1,6 +1,7 @@
 package dev.drtheo.autojson.schema.bake.unsafe;
 
 import dev.drtheo.autojson.AutoJSON;
+import dev.drtheo.autojson.SchemaHolder;
 import dev.drtheo.autojson.schema.ObjectSchema;
 import dev.drtheo.autojson.schema.Schema;
 import dev.drtheo.autojson.adapter.JsonAdapter;
@@ -9,6 +10,7 @@ import dev.drtheo.autojson.adapter.JsonSerializationContext;
 import dev.drtheo.autojson.annotation.Exclude;
 import dev.drtheo.autojson.annotation.Instantiate;
 import dev.drtheo.autojson.annotation.TypeHint;
+import dev.drtheo.autojson.util.Lazy;
 import dev.drtheo.autojson.util.UnsafeUtil;
 
 import java.lang.reflect.Field;
@@ -57,24 +59,24 @@ public class BakedAutoSchema<T> implements ObjectSchema<T> {
         return new BakedAutoSchema<>(clazz, types, map, safeInstance);
     }
 
-    record FieldType<T, E>(Type type, ClassAdapter<E, E[]> adapter, String name, long offset, Schema<E> schema) {
+    record FieldType<T, E>(Type type, ClassAdapter<E, E[]> adapter, String name, long offset, Lazy<Schema<E>> schema) {
 
-        public static <T, E> FieldType<T, E> from(AutoJSON auto, Field field) {
-            Class<E> type = (Class<E>) field.getType();
+        public static <T, E> FieldType<T, E> from(SchemaHolder holder, Field field) {
+            Type type = field.getGenericType();
             ClassAdapter<E, E[]> adapter = (ClassAdapter<E, E[]>) ClassAdapter.match(type);
 
             TypeHint hint = field.getAnnotation(TypeHint.class);
-            Schema<E> schema = null;
+            Lazy<Schema<E>> schema = new Lazy<>(() -> holder.schema(type));
 
             // FIXME @TypeHint
 //            if (hint != null)
 //                schema = new TypeWrapperSchema<>(
-//                        auto, type, () -> Schema.createInstance(
+//                        holder, type, () -> Schema.createInstance(
 //                                (Class<? extends E>) hint.value(), true)
 //                );
 
-            return new FieldType<>(field.getGenericType(), adapter,
-                    field.getName(), UnsafeUtil.UNSAFE.objectFieldOffset(field), schema);
+            return new FieldType<>(type, adapter, field.getName(),
+                    UnsafeUtil.UNSAFE.objectFieldOffset(field), schema);
         }
 
         public E get(T obj) {
@@ -83,13 +85,6 @@ public class BakedAutoSchema<T> implements ObjectSchema<T> {
 
         public void set(T obj, E value) {
             this.adapter.set(UnsafeUtil.UNSAFE, obj, offset, value);
-        }
-
-        public Schema<E> schema(AutoJSON auto) {
-            if (this.schema != null)
-                return this.schema;
-
-            return auto.schema(type);
         }
     }
 
@@ -118,11 +113,15 @@ public class BakedAutoSchema<T> implements ObjectSchema<T> {
     @Override
     public <To> void serialize(JsonAdapter<Object, To> auto, JsonSerializationContext.Obj c, T t) {
         for (FieldType<T, ?> field : this.fields) {
-            if (field == null)
-                continue;
-
-            c.obj$put(field.name(), field.get(t), field.type());
+            serialize(field, c, t);
         }
+    }
+
+    private static <T, E> void serialize(FieldType<T, E> field, JsonSerializationContext.Obj c, T t) {
+        if (field == null)
+            return;
+
+        c.obj$put(field.name(), field.get(t), field.type(), field.schema().get());
     }
 
     @Override
@@ -145,7 +144,7 @@ public class BakedAutoSchema<T> implements ObjectSchema<T> {
     }
 
     private static <T, E> void deserialize(FieldType<T, E> field, T t, JsonDeserializationContext c) {
-        E e = c.decode(field.type(), field.schema(c.auto()));
+        E e = c.decode(field.type(), field.schema().get());
         field.set(t, e);
     }
 }

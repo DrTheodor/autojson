@@ -19,4 +19,14 @@ public class ObjectClassAdapter implements ClassAdapter<Object, Object[]> {
     public void set(Object[] ts, int index, Object value) {
         ts[index] = value;
     }
+
+    @Override
+    public int getLength(Object[] ts) {
+        return ts.length;
+    }
+
+    @Override
+    public Object get(Object[] ts, int index) {
+        return ts[index];
+    }
 }

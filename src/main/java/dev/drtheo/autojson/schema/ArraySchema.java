@@ -4,17 +4,17 @@ import dev.drtheo.autojson.adapter.JsonAdapter;
 import dev.drtheo.autojson.adapter.JsonDeserializationContext;
 import dev.drtheo.autojson.adapter.JsonSerializationContext;
 
-public non-sealed interface ArraySchema<T> extends Schema<T> {
+public non-sealed interface ArraySchema<T, Intermediary> extends Schema<T> {
 
     <To> void serialize(JsonAdapter<Object, To> auto, JsonSerializationContext.Array c, T t);
 
     /**
      * @return the array as an {@link Object}.
      */
-    Object instantiate();
+    Intermediary instantiate();
 
-    default Object pack(Object obj) {
-        return obj;
+    default T pack(Intermediary obj) {
+        return (T) obj;
     }
 
     @Override
@@ -26,5 +26,5 @@ public non-sealed interface ArraySchema<T> extends Schema<T> {
         return obj.array$build();
     }
 
-    <To> Object deserialize(JsonAdapter<Object, To> auto, JsonDeserializationContext c, Object o, int index);
+    <To> Intermediary deserialize(JsonAdapter<Object, To> auto, JsonDeserializationContext c, Intermediary o, int index);
 }

@@ -16,6 +16,16 @@ public class ByteClassAdapter  extends ClassAdapter.Num<Byte, byte[]> {
     }
 
     @Override
+    public int getLength(byte[] ts) {
+        return ts.length;
+    }
+
+    @Override
+    public Byte get(byte[] ts, int index) {
+        return ts[index];
+    }
+
+    @Override
     protected void set0(Unsafe unsafe, Object obj, long address, @NotNull Byte value) {
         unsafe.putByte(obj, address, value);
     }

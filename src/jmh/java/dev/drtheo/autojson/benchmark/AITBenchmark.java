@@ -7,7 +7,7 @@ import dev.drtheo.autojson.benchmark.ait.Id;
 import dev.drtheo.autojson.benchmark.ait.Tardis;
 import dev.drtheo.autojson.benchmark.ait.WorldKey;
 import dev.drtheo.autojson.schema.PrimitiveSchema;
-import org.openjdk.jmh.annotations.Benchmark;
+import org.openjdk.jmh.annotations.*;
 import org.openjdk.jmh.infra.Blackhole;
 
 import java.util.*;
@@ -16,7 +16,10 @@ public class AITBenchmark extends AutoVsGsonBenchmark {
 
     static Tardis tardis = new Tardis();
 
-    static {
+    @Override
+    public void setup() {
+        super.setup();
+
         auto.schema(WorldKey.class, new WorldKeySchema());
         auto.schema(Id.class, new IdSchema());
         auto.schema(UUID.class, new UUIDSchema());
@@ -25,14 +28,14 @@ public class AITBenchmark extends AutoVsGsonBenchmark {
     @Benchmark
     public void autoSerialize(Blackhole blackhole) {
         for (int i = 0; i < iters; i++) {
-            blackhole.consume(adapter.toJson(tardis));
+            adapter.toJson(tardis);
         }
     }
 
-    @Benchmark
+//    @Benchmark
     public void gsonSerialize(Blackhole blackhole) {
         for (int i = 0; i < iters; i++) {
-            blackhole.consume(gson.toJson(tardis));
+            gson.toJson(tardis);
         }
     }
 

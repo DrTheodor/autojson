@@ -4,6 +4,8 @@ import sun.misc.Unsafe;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Type;
+import java.util.Map;
+import java.util.function.Function;
 
 public class UnsafeUtil {
 
@@ -17,6 +19,20 @@ public class UnsafeUtil {
         } catch (NoSuchFieldException | IllegalAccessException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public static <K, V> V computeIfAbsent(
+            Map<K, V> cache, K key,
+            Function<? super K, ? extends V> function
+    ) {
+        V result = cache.get(key);
+
+        if (result == null) {
+            result = function.apply(key);
+            cache.put(key, result);
+        }
+
+        return result;
     }
 
     public static boolean isPrimitive(Type type) {

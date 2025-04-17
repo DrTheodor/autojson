@@ -12,6 +12,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class AutoJSON implements SchemaHolder {
 
@@ -19,6 +20,7 @@ public class AutoJSON implements SchemaHolder {
         return UnsafeUtil.isPrimitive(type) || type == String.class;
     }
 
+    // FIXME!
     private final Map<Type, Schema<?>> schemas = new HashMap<>();
 
     private int layer = 0;
@@ -45,7 +47,7 @@ public class AutoJSON implements SchemaHolder {
         if (isPrimitive(type))
             return null;
 
-        return (Schema<T>) schemas.computeIfAbsent(type, this::createSchema);
+        return (Schema<T>) UnsafeUtil.computeIfAbsent(schemas, type, this::createSchema);
     }
 
     @SuppressWarnings("unchecked")
@@ -62,10 +64,10 @@ public class AutoJSON implements SchemaHolder {
 
         if (type instanceof ParameterizedType parameterized) {
             if (parameterized.getRawType() == Set.class)
-                return (Schema<T>) new JavaSetSchema<>(parameterized);
+                return (Schema<T>) new JavaSetSchema<>(this, parameterized);
 
             if (parameterized.getRawType() == Map.class)
-                return (Schema<T>) new JavaMapSchema<>(parameterized);
+                return (Schema<T>) new JavaMapSchema<>(this, parameterized);
 
             if (parameterized.getRawType() == List.class)
                 return (Schema<T>) new JavaListSchema<>(this, parameterized);

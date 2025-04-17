@@ -3,7 +3,6 @@ package dev.drtheo.autojson.adapter;
 import dev.drtheo.autojson.schema.Schema;
 
 import java.lang.reflect.Type;
-import java.util.function.Supplier;
 
 public interface JsonSerializationContext extends JsonContext {
 
@@ -19,6 +18,9 @@ public interface JsonSerializationContext extends JsonContext {
         }
 
         Obj obj$put(String key, Object value, Type type);
+
+        <T> Obj obj$put(String key, T value, Type type, Schema<T> schema);
+
         Built obj$build();
     }
 
@@ -28,6 +30,8 @@ public interface JsonSerializationContext extends JsonContext {
         }
 
         Array array$element(Object value, Type type);
+
+        <T> Array array$element(T value, Type type, Schema<T> schema);
         Built array$build();
     }
 

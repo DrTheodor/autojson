@@ -4,8 +4,6 @@ import dev.drtheo.autojson.schema.bake.unsafe.ClassAdapter;
 import org.jetbrains.annotations.NotNull;
 import sun.misc.Unsafe;
 
-import java.util.function.Function;
-
 public class IntClassAdapter extends ClassAdapter.Num<Integer, int[]> {
 
     public IntClassAdapter() {
@@ -15,6 +13,16 @@ public class IntClassAdapter extends ClassAdapter.Num<Integer, int[]> {
     @Override
     public @NotNull Integer get(Unsafe unsafe, Object obj, long address) {
         return unsafe.getInt(obj, address);
+    }
+
+    @Override
+    public int getLength(int[] ts) {
+        return ts.length;
+    }
+
+    @Override
+    public Integer get(int[] ts, int index) {
+        return ts[index];
     }
 
     @Override

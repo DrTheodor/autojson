@@ -16,6 +16,16 @@ public class BooleanClassAdapter extends ClassAdapter.Primitive<Boolean, boolean
     }
 
     @Override
+    public int getLength(boolean[] ts) {
+        return ts.length;
+    }
+
+    @Override
+    public Boolean get(boolean[] ts, int index) {
+        return ts[index];
+    }
+
+    @Override
     protected void set0(Unsafe unsafe, Object obj, long address, @NotNull Boolean value) {
         unsafe.putBoolean(obj, address, value);
     }

@@ -7,12 +7,8 @@ import dev.drtheo.autojson.schema.PrimitiveSchema;
 import dev.drtheo.autojson.schema.Schema;
 import dev.drtheo.autojson.adapter.JsonDeserializationContext;
 import dev.drtheo.autojson.adapter.string.parser.JsonReader;
-import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.Type;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.function.Supplier;
 
 public class JsonStringParser implements JsonDeserializationContext {
 
@@ -36,7 +32,7 @@ public class JsonStringParser implements JsonDeserializationContext {
         if (schema instanceof ObjectSchema<T> obj)
             return parser.deserializeObject(obj);
 
-        if (schema instanceof ArraySchema<T> arr)
+        if (schema instanceof ArraySchema<T, ?> arr)
             return (T) parser.deserializeArray(arr);
 
         if (type == null || AutoJSON.isPrimitive(type)) {
@@ -70,17 +66,15 @@ public class JsonStringParser implements JsonDeserializationContext {
         return t;
     }
 
-    private <T> Object deserializeArray(ArraySchema<T> o) {
+    private <T> Object deserializeArray(ArraySchema<T, ?> o) {
         return deserializeArray(reader.nextToken(), o);
     }
 
-    private <T> Object deserializeArray(JsonReader.Token start, ArraySchema<T> o) {
-        List<JsonReader.Token> listBuf = new ArrayList<>();
-
+    private <T, Intr> Object deserializeArray(JsonReader.Token start, ArraySchema<T, Intr> o) {
         if (start.type() != JsonReader.TokenType.BEGIN_ARRAY)
             throw new IllegalStateException("Not an array");
 
-        Object t = o.instantiate();
+        Intr t = o.instantiate();
         int i = 0;
 
         while (reader.hasNext()) {
@@ -123,12 +117,17 @@ public class JsonStringParser implements JsonDeserializationContext {
     }
 
     @Override
-    public <T> T decode(Type type, Schema<T> fieldSchema) {
-        if (this.current == OBJ_MARKER)
-            return deserializeObject((ObjectSchema<T>) fieldSchema);
+    public <T> T decode(Type type) {
+        return decode(type, this.adapter.schema(type));
+    }
 
-        if (this.current == ARRAY_MARKER)
-            return (T) deserializeArray(reader.peekToken(), (ArraySchema<T>) fieldSchema);
+    @Override
+    public <T> T decode(Type type, Schema<T> fieldSchema) {
+        if (this.current == OBJ_MARKER && fieldSchema instanceof ObjectSchema<T> objSchema)
+            return deserializeObject(objSchema);
+
+        if (this.current == ARRAY_MARKER && fieldSchema instanceof ArraySchema<T, ?> arraySchema)
+            return (T) deserializeArray(reader.peekToken(), arraySchema);
 
         if (type == null || AutoJSON.isPrimitive(type)) {
             if (fieldSchema instanceof PrimitiveSchema<T> ps)

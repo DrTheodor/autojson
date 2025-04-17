@@ -22,13 +22,13 @@ public class JsonStringAdapter implements JsonAdapter<Object, String> {
 
         JsonStringBuilder ctx = new JsonStringBuilder(this);
 
-        toJson(ctx, obj, type);
+        toJson(ctx, obj, type, auto.schema(type));
         return ctx.toString();
     }
 
-    protected <T> void toJson(JsonStringBuilder ctx, T obj, Type type) {
+    protected <T> void toJson(JsonStringBuilder ctx, T obj, Type type, Schema<T> s) {
         try {
-            auto.schema(type).serialize(this, ctx, obj);
+            s.serialize(this, ctx, obj);
         } catch (Exception e) {
             System.err.println("Failed to serialize " + type);
             throw e;
