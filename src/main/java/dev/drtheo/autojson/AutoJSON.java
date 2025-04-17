@@ -12,7 +12,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.BiFunction;
 
 public class AutoJSON implements SchemaHolder {
 
@@ -20,8 +20,8 @@ public class AutoJSON implements SchemaHolder {
         return UnsafeUtil.isPrimitive(type) || type == String.class;
     }
 
-    // FIXME!
     private final Map<Type, Schema<?>> schemas = new HashMap<>();
+    private final Map<Type, TemplateCreator<?>> templates = new HashMap<>();
 
     private int layer = 0;
     private boolean logMisingEntries = true;
@@ -32,6 +32,10 @@ public class AutoJSON implements SchemaHolder {
 
     public void setLayer(int layer) {
         this.layer = layer;
+    }
+
+    public <T> void template(Class<T> type, TemplateCreator<T> func) {
+        templates.put(type, func);
     }
 
     public <T> Schema<T> schema(Type type, Schema<T> schema) {
@@ -71,6 +75,11 @@ public class AutoJSON implements SchemaHolder {
 
             if (parameterized.getRawType() == List.class)
                 return (Schema<T>) new JavaListSchema<>(this, parameterized);
+
+            TemplateCreator<?> creator = this.templates.get(parameterized.getRawType());
+
+            if (creator != null)
+                return (Schema<T>) creator.apply(this, parameterized);
         }
 
         throw new IllegalArgumentException("Can't handle type " + type);
@@ -93,7 +102,7 @@ public class AutoJSON implements SchemaHolder {
     }
 
     public boolean logMissingEntries() {
-        return true;
+        return logMisingEntries;
     }
 
     public void log(String message) {
@@ -103,4 +112,7 @@ public class AutoJSON implements SchemaHolder {
     public void warn(String message) {
         System.err.println("[WARN] " + message);
     }
+
+    @FunctionalInterface
+    public interface TemplateCreator<T> extends BiFunction<SchemaHolder, ParameterizedType, Schema<T>> { }
 }

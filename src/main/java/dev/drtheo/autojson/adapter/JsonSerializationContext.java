@@ -36,7 +36,7 @@ public interface JsonSerializationContext extends JsonContext {
     }
 
     interface Primitive {
-        Array primitive$value(Object value);
+        void primitive$value(Object value);
         Built primitive$build();
     }
 }

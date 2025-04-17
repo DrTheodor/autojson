@@ -1,3 +1,23 @@
+## 17.04.25
+
+```java
+class JsonSerializationContext
+
+Array primitive$value(Object o);
+```
+
+- shouldn't return an array!
+
+```java
+class JsonSerializationContext
+
+AutoJSON auto();
+```
+
+- shouldnt be used!
+UPD: nvm, it should be used for settings.
+
+also should allow for generic schemas
 
 ## 16.04.25
 Ok so some thinking about it
