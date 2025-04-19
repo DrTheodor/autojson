@@ -1,6 +1,6 @@
 package dev.drtheo.autojson.benchmark;
 
-import dev.drtheo.autojson.Bean;
+import dev.drtheo.autojson.benchmark.beans.Bean;
 import org.openjdk.jmh.annotations.*;
 import org.openjdk.jmh.infra.Blackhole;
 

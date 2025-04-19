@@ -1,6 +1,6 @@
-package dev.drtheo.autojson;
+package dev.drtheo.autojson.benchmark.beans;
 
-import com.google.gson.Gson;
+import dev.drtheo.autojson.AutoJSON;
 import dev.drtheo.autojson.adapter.string.JsonStringAdapter;
 
 import java.util.ArrayList;
@@ -8,6 +8,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
+@SuppressWarnings("FieldMayBeFinal")
 public class Bean {
     private int primInt = Integer.MAX_VALUE;
     private boolean primBool = true;
@@ -18,30 +19,30 @@ public class Bean {
     private float primFloat = Float.MAX_VALUE;
     private long primLong = Long.MAX_VALUE;
 
-    private int[] intArr = new int[] {
+    private final int[] intArr = new int[] {
             1, 2, 3, 4, 5, 6, 7, 8, 9, 0
     };
 
-    private String[] strArr = new String[]{
+    private final String[] strArr = new String[]{
             "hippity", "hoppity"
     };
 
-    private List<String> strList = new ArrayList<>() {{
+    private final List<String> strList = new ArrayList<>() {{
         add("never gonna give you up");
         add("never gonna let you down");
     }};
 
-    private Integer intObj = Integer.MAX_VALUE;
-    private Boolean boolObj = true;
-    private Byte byteObj = Byte.MAX_VALUE;
-    private Character charObj = Character.MAX_VALUE;
-    private Short shortObj = Short.MAX_VALUE;
-    private Double doubleObj = Double.MAX_VALUE;
-    private Float floatObj = Float.MAX_VALUE;
-    private Long longObj = Long.MAX_VALUE;
+    private final Integer intObj = Integer.MAX_VALUE;
+    private final Boolean boolObj = true;
+    private final Byte byteObj = Byte.MAX_VALUE;
+    private final Character charObj = Character.MAX_VALUE;
+    private final Short shortObj = Short.MAX_VALUE;
+    private final Double doubleObj = Double.MAX_VALUE;
+    private final Float floatObj = Float.MAX_VALUE;
+    private final Long longObj = Long.MAX_VALUE;
 
     private String hello = "HELLO MATE";
-    private Id id = new Id("ait", "whatever");
+    private final Id id = new Id("ait", "whatever");
     //private Sound sound = new Sound(id);
 
     static class Id {
@@ -62,6 +63,7 @@ public class Bean {
         }
     }
 
+    @SuppressWarnings("unused")
     record Sound(Id id) {
 
     }
@@ -125,16 +127,6 @@ public class Bean {
 
         for (int i = 0; i < 1_000_000; i++) {
             adapter.toJson(bean, Bean.class);
-        }
-
-        Gson gson = new Gson();
-
-        for (int i = 0; i < 1_000_000; i++) {
-            gson.fromJson(raw, Bean.class);
-        }
-
-        for (int i = 0; i < 1_000_000; i++) {
-            gson.toJson(bean, Bean.class);
         }
     }
 }

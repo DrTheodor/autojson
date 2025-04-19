@@ -1,5 +1,6 @@
-package dev.drtheo.autojson;
+package dev.drtheo.autojson.benchmark.beans;
 
+import dev.drtheo.autojson.AutoJSON;
 import dev.drtheo.autojson.adapter.string.JsonStringAdapter;
 
 import java.util.*;
@@ -29,6 +30,7 @@ public class Bean2 {
 
     @Override
     public String toString() {
+        @SuppressWarnings("StringBufferReplaceableByString")
         StringBuilder builder = new StringBuilder();
         builder.append("Bean2 {\n");
 

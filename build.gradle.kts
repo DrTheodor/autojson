@@ -7,7 +7,7 @@ plugins {
 }
 
 group = "dev.drtheo"
-version = "0.0.10-dev.1"
+version = "0.1.0-dev.1"
 
 repositories {
     mavenCentral()
@@ -17,7 +17,6 @@ dependencies {
     testImplementation(platform("org.junit:junit-bom:5.10.0"))
     testImplementation("org.junit.jupiter:junit-jupiter")
 
-    implementation("com.google.code.gson:gson:2.8.9")
     jmh("com.google.code.gson:gson:2.8.9")
 
     compileOnly("org.jetbrains:annotations:26.0.2")

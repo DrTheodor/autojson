@@ -2,8 +2,8 @@ package dev.drtheo.autojson.benchmark;
 
 import com.google.gson.Gson;
 import dev.drtheo.autojson.AutoJSON;
-import dev.drtheo.autojson.Bean;
 import dev.drtheo.autojson.adapter.string.JsonStringAdapter;
+import dev.drtheo.autojson.benchmark.beans.Bean;
 import org.openjdk.jmh.annotations.*;
 
 import java.util.concurrent.TimeUnit;
