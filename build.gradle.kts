@@ -89,7 +89,7 @@ dokka {
     }
     pluginsConfiguration.html {
         //customStyleSheets.from("styles.css")
-        customAssets.from(docsFolder.file("logo-image.svg"))
+        customAssets.from(docsFolder.file("logo-icon.svg"))
         footerMessage.set("(c) DrTheo_")
     }
 }
