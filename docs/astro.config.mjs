@@ -28,6 +28,7 @@ export default defineConfig({
 						{ label: 'Tips & Tricks', slug: 'guides/tips-n-tricks' },
 					],
 				},
+				{ label: 'Benchmark', slug: 'benchmark' }
 			],
 			editLink: {
 				baseUrl: 'https://github.com/DrTheodor/autojson/edit/main/docs/'
