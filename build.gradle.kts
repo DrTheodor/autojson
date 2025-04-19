@@ -1,5 +1,4 @@
 import org.gradle.internal.os.OperatingSystem
-import java.time.Year
 
 plugins {
     id("java")
@@ -57,14 +56,17 @@ task<Exec>("pushMavenRepo") {
 }
 
 task("justPublish") {
-    dependsOn(tasks.javadoc)
+    dependsOn(tasks.dokkaGenerate)
     dependsOn(tasks["publishLibPublicationToGhRepository"])
 }
 
 dokka {
     val docsFolder = layout.projectDirectory.dir("docs").dir("public")
-    val assets = layout.projectDirectory.dir("assets")
-    val dokkaAssets = assets.dir("dokka")
+    val dokkaAssets = layout.projectDirectory.dir("assets").dir("dokka")
+
+    val name = "DrTheo_"
+    val repo = "https://github.com/DrTheodor/autojson"
+    val personalLink = "https://theo.is-a.dev/"
 
     moduleName.set("autojson")
 
@@ -79,56 +81,25 @@ dokka {
         jdkVersion.set(17)
 
         externalDocumentationLinks.register("jdk17") {
-            url("https://docs.oracle.com/en/java/javase/17/docs/api/")
-            packageListUrl("https://docs.oracle.com/en/java/javase/17/docs/api/element-list")
+            val jdkDocs = "https://docs.oracle.com/en/java/javase/17/docs/api"
+            url("$jdkDocs/")
+            packageListUrl("$jdkDocs/element-list")
         }
 
         sourceLink {
-            localDirectory.set(file("src/main/java"))
-            remoteUrl("https://github.com/DrTheodor/autojson/blob/main/")
+            val path = "src/main/java"
+            localDirectory.set(file(path))
+            remoteUrl("$repo/blob/main/$path")
             remoteLineSuffix.set("#L")
         }
     }
     pluginsConfiguration.html {
         customStyleSheets.from(dokkaAssets.file("dokka.css"))
         customAssets.from(dokkaAssets.file("logo-icon-white.svg"), dokkaAssets.file("logo-icon.svg"))
-        footerMessage.set("(c) DrTheo_")
+
+        val footerClass = "footer--link_personal"
+        footerMessage.set("(c) <a class=\"$footerClass\" href=\"$personalLink\">$name</a>")
     }
-}
-
-tasks.javadoc {
-    val docsFolder = layout.projectDirectory.dir("docs").dir("public")
-
-    options {
-        this as StandardJavadocDocletOptions
-
-        tags = listOf(
-            "apiNote:a:API Note:",
-            "implSpec:a:Implementation Requirements:",
-            "implNote:a:Implementation Note:"
-        )
-
-        encoding = "UTF-8"
-        docEncoding = "UTF-8"
-        charSet = "UTF-8"
-        memberLevel = JavadocMemberLevel.PROTECTED
-
-        windowTitle = "AutoJSON API"
-        docTitle = "AutoJSON API Documentation"
-        bottom = """
-            <a href="https://theo.is-a.dev/">DrTheo_</a> © ${Year.now().value}
-        """.trimIndent()
-
-        links("https://docs.oracle.com/en/java/javase/17/docs/api/")
-
-        addStringOption("stylesheetfile", docsFolder.file("javadocs.css").asFile.absolutePath)
-    }
-
-    if (JavaVersion.current().isJava9Compatible) {
-        (options as StandardJavadocDocletOptions).addBooleanOption("html5", true)
-    }
-
-    setDestinationDir(docsFolder.dir("javadocs").asFile)
 }
 
 tasks["publishLibPublicationToGhRepository"].finalizedBy("pushMavenRepo")

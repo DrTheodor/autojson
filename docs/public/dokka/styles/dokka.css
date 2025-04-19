@@ -3,3 +3,7 @@
     --dokka-logo-height: 100px;
     --dokka-logo-width: 100px;
 }
+
+.footer--link_personal {
+    color: white;
+}
