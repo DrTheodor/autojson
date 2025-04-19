@@ -2,8 +2,8 @@ package dev.drtheo.autojson.adapter.string;
 
 import dev.drtheo.autojson.AutoJSON;
 import dev.drtheo.autojson.adapter.JsonSerializationContext;
-import dev.drtheo.autojson.schema.PrimitiveSchema;
-import dev.drtheo.autojson.schema.Schema;
+import dev.drtheo.autojson.schema.base.PrimitiveSchema;
+import dev.drtheo.autojson.schema.base.Schema;
 import dev.drtheo.autojson.util.UnsafeUtil;
 import org.jetbrains.annotations.Nullable;
 

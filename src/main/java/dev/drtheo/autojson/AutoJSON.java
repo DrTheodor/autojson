@@ -1,10 +1,13 @@
 package dev.drtheo.autojson;
 
 import dev.drtheo.autojson.adapter.JsonAdapter;
-import dev.drtheo.autojson.schema.Schema;
-import dev.drtheo.autojson.schema.bake.unsafe.BakedAutoSchema;
-import dev.drtheo.autojson.schema.impl.*;
-import dev.drtheo.autojson.schema.impl.template.*;
+import dev.drtheo.autojson.logger.DelegateLogger;
+import dev.drtheo.autojson.logger.Logger;
+import dev.drtheo.autojson.logger.SystemLogger;
+import dev.drtheo.autojson.schema.UUIDSchema;
+import dev.drtheo.autojson.schema.base.Schema;
+import dev.drtheo.autojson.schema.baked.BakedClassAutoSchema;
+import dev.drtheo.autojson.schema.template.*;
 import dev.drtheo.autojson.util.UnsafeUtil;
 
 import java.lang.reflect.ParameterizedType;
@@ -13,7 +16,7 @@ import java.util.*;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
-public class AutoJSON implements SchemaHolder {
+public class AutoJSON implements SchemaHolder, DelegateLogger {
 
     /**
      * @return {@code true} when the {@code type} is a primitive (boxed or not) or if it's a {@link String}.
@@ -25,13 +28,21 @@ public class AutoJSON implements SchemaHolder {
     private final Map<Type, Schema<?>> schemas = new HashMap<>();
     private final Map<Type, TemplateCreator<?>> templates = new HashMap<>();
 
+    private final Logger logger;
+
     private int layer = 0;
     private boolean logMisingEntries = true;
     private boolean safeInstancing = false;
 
     public AutoJSON() {
+        this.logger = this.setupLogger();
+
         this.defaultSchemas();
         this.defaultTemplates();
+    }
+
+    protected Logger setupLogger() {
+        return new SystemLogger();
     }
 
     /**
@@ -43,7 +54,7 @@ public class AutoJSON implements SchemaHolder {
     }
 
     /**
-     * @return Whether to log missing object entries. Used by {@link BakedAutoSchema}.
+     * @return Whether to log missing object entries. Used by {@link BakedClassAutoSchema}.
      */
     public boolean logMissingEntries() {
         return logMisingEntries;
@@ -169,7 +180,7 @@ public class AutoJSON implements SchemaHolder {
             if (clazz.isEnum())
                 return (Schema<T>) JavaEnumSchema.unwrap(clazz);
 
-            return (Schema<T>) BakedAutoSchema.bake(this, clazz);
+            return (Schema<T>) BakedClassAutoSchema.bake(this, clazz);
         }
 
         if (type instanceof ParameterizedType parameterized) {
@@ -233,12 +244,9 @@ public class AutoJSON implements SchemaHolder {
         return adapter.fromJson(obj, clazz);
     }
 
-    public void log(String message) {
-        System.out.println("[INFO] " + message);
-    }
-
-    public void warn(String message) {
-        System.err.println("[WARN] " + message);
+    @Override
+    public Logger logger() {
+        return logger;
     }
 
     @FunctionalInterface

@@ -1,13 +1,7 @@
 package dev.drtheo.autojson.test;
 
 import dev.drtheo.autojson.AutoJSON;
-import dev.drtheo.autojson.adapter.JsonAdapter;
-import dev.drtheo.autojson.adapter.JsonDeserializationContext;
-import dev.drtheo.autojson.adapter.JsonSerializationContext;
 import dev.drtheo.autojson.adapter.string.JsonStringAdapter;
-import dev.drtheo.autojson.schema.ArraySchema;
-import dev.drtheo.autojson.schema.ObjectSchema;
-import dev.drtheo.autojson.schema.Schema;
 
 import java.util.Arrays;
 

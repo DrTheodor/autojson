@@ -1,8 +1,8 @@
 package dev.drtheo.autojson.adapter;
 
 import dev.drtheo.autojson.AutoJSON;
-import dev.drtheo.autojson.schema.PrimitiveSchema;
-import dev.drtheo.autojson.schema.Schema;
+import dev.drtheo.autojson.schema.base.PrimitiveSchema;
+import dev.drtheo.autojson.schema.base.Schema;
 
 import java.lang.reflect.Type;
 
@@ -29,10 +29,29 @@ public interface JsonSerializationContext extends JsonContext {
     }
 
     interface Array extends JsonContext {
+        /**
+         * Puts a value in the currently building array.
+         *
+         * @param value the value to put.
+         * @return The array context.
+         *
+         * @implNote Equivalent to calling {@link #array$element(Object, Type)}
+         * with the {@code claas} being {@code value.getClass()}
+         */
         default Array array$element(Object value) {
             return array$element(value, value.getClass());
         }
 
+        /**
+         * Puts a value in the currently building array.
+         *
+         * @param value the value to put.
+         * @param type the type of the value.
+         * @return The array context.
+         *
+         * @implNote Equivalent to calling {@link #array$element(Object, Type, Schema)}
+         * with the {@code schema} being supplied by the {@link JsonContext#schema(Type)}.
+         */
         default Array array$element(Object value, Type type) {
             return array$element(value, type, schema(type));
         }

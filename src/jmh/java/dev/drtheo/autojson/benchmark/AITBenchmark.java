@@ -6,11 +6,9 @@ import dev.drtheo.autojson.adapter.JsonSerializationContext;
 import dev.drtheo.autojson.benchmark.ait.Id;
 import dev.drtheo.autojson.benchmark.ait.Tardis;
 import dev.drtheo.autojson.benchmark.ait.WorldKey;
-import dev.drtheo.autojson.schema.PrimitiveSchema;
+import dev.drtheo.autojson.schema.base.PrimitiveSchema;
 import org.openjdk.jmh.annotations.*;
 import org.openjdk.jmh.infra.Blackhole;
-
-import java.util.*;
 
 public class AITBenchmark extends AutoVsGsonBenchmark {
 
@@ -22,7 +20,6 @@ public class AITBenchmark extends AutoVsGsonBenchmark {
 
         auto.schema(WorldKey.class, new WorldKeySchema());
         auto.schema(Id.class, new IdSchema());
-        auto.schema(UUID.class, new UUIDSchema());
     }
 
     @Benchmark
@@ -39,19 +36,6 @@ public class AITBenchmark extends AutoVsGsonBenchmark {
         }
     }
 
-    static class UUIDSchema implements PrimitiveSchema<UUID> {
-
-        @Override
-        public <To> void serialize(JsonAdapter<Object, To> auto, JsonSerializationContext.Primitive c, UUID id) {
-            c.primitive$value(id.toString());
-        }
-
-        @Override
-        public <To> UUID deserialize(JsonAdapter<Object, To> auto, JsonDeserializationContext c) {
-            return UUID.fromString(c.decode(String.class));
-        }
-    }
-
     static class WorldKeySchema implements PrimitiveSchema<WorldKey> {
 
         @Override
@@ -62,7 +46,7 @@ public class AITBenchmark extends AutoVsGsonBenchmark {
 
         @Override
         public <To> WorldKey deserialize(JsonAdapter<Object, To> auto, JsonDeserializationContext c) {
-            String s = c.decode(String.class);
+            String s = c.decodeBuiltIn();
             int slash = s.indexOf('/');
 
             String first = s.substring(0, slash);
@@ -84,7 +68,7 @@ public class AITBenchmark extends AutoVsGsonBenchmark {
 
         @Override
         public <To> Id deserialize(JsonAdapter<Object, To> auto, JsonDeserializationContext c) {
-            return Id.fromString(c.decode(String.class));
+            return Id.fromString(c.decodeBuiltIn());
         }
     }
 }

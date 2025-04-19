@@ -1,12 +1,10 @@
 package dev.drtheo.autojson.adapter.string;
 
 import dev.drtheo.autojson.AutoJSON;
-import dev.drtheo.autojson.schema.ArraySchema;
-import dev.drtheo.autojson.schema.ObjectSchema;
-import dev.drtheo.autojson.schema.PrimitiveSchema;
-import dev.drtheo.autojson.schema.Schema;
 import dev.drtheo.autojson.adapter.JsonDeserializationContext;
 import dev.drtheo.autojson.adapter.string.parser.JsonReader;
+import dev.drtheo.autojson.schema.base.*;
+import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.Type;
 
@@ -25,24 +23,25 @@ public class JsonStringParser implements JsonDeserializationContext {
         this.reader = new JsonReader(raw);
     }
 
+    @SuppressWarnings("unchecked")
     public static <T> T process(JsonStringAdapter adapter, String raw, Type type) {
         JsonStringParser parser = new JsonStringParser(adapter, raw);
         Schema<T> schema = adapter.schema(type);
 
-        if (schema instanceof ObjectSchema<T> obj)
-            return parser.deserializeObject(obj);
+        if (schema.type() == SchemaType.OBJECT)
+            return parser.deserializeObject(schema.asObject());
 
-        if (schema instanceof ArraySchema<T, ?> arr)
-            return (T) parser.deserializeArray(arr);
+        if (schema.type() == SchemaType.ARRAY)
+            return (T) parser.deserializeArray(schema.asArray());
 
-        if (type == null || AutoJSON.isBuiltIn(type)) {
-            if (schema instanceof PrimitiveSchema<T> ps)
-                return parser.deserializePrimitive(ps);
+        if (AutoJSON.isBuiltIn(type)) {
+            if (schema.type() == SchemaType.PRIMITIVE)
+                return parser.deserializePrimitive(schema.asPrimitive());
 
-            return parser.deserializePrimitive(type);
+            return parser.deserializePrimitive();
         }
 
-        throw new IllegalArgumentException("Unsupported schema type: " + type);
+        throw new IllegalArgumentException("No schema for class: " + type.getTypeName());
     }
 
     private <T> T deserializeObject(ObjectSchema<T> o) {
@@ -95,9 +94,9 @@ public class JsonStringParser implements JsonDeserializationContext {
         return o.deserialize(this.adapter, this);
     }
 
-    private <T> T deserializePrimitive(Type type) {
+    private <T> T deserializePrimitive() {
         this.setValue(reader.nextToken());
-        return decode(type);
+        return decodeBuiltIn();
     }
 
     private void setValue(JsonReader.Token value) {
@@ -122,24 +121,22 @@ public class JsonStringParser implements JsonDeserializationContext {
     }
 
     @Override
-    public <T> T decode(Type type) {
-        return decode(type, this.adapter.schema(type));
+    @SuppressWarnings("unchecked")
+    public <T> T decodeBuiltIn() {
+        return (T) current;
     }
 
     @Override
-    public <T> T decode(Type type, Schema<T> fieldSchema) {
-        if (this.current == OBJ_MARKER && fieldSchema instanceof ObjectSchema<T> objSchema)
-            return deserializeObject(objSchema);
+    @SuppressWarnings("unchecked")
+    public <T> T decodeCustom(Type type, @NotNull Schema<T> fieldSchema) {
+        if (this.current == OBJ_MARKER && fieldSchema.type() == SchemaType.OBJECT)
+            return deserializeObject(fieldSchema.asObject());
 
-        if (this.current == ARRAY_MARKER && fieldSchema instanceof ArraySchema<T, ?> arraySchema)
-            return (T) deserializeArray(reader.peekToken(), arraySchema);
+        if (this.current == ARRAY_MARKER && fieldSchema.type() == SchemaType.ARRAY)
+            return (T) deserializeArray(reader.peekToken(), fieldSchema.asArray());
 
-        if (type == null || AutoJSON.isBuiltIn(type)) {
-            if (fieldSchema instanceof PrimitiveSchema<T> ps)
-                return deserializePrimitive(ps);
-
-            return (T) current;
-        }
+        if (fieldSchema.type() == SchemaType.PRIMITIVE)
+            return deserializePrimitive(fieldSchema.asPrimitive());
 
         throw new IllegalStateException("No schema for class " + type.getTypeName());
     }

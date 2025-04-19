@@ -1,7 +1,7 @@
 package dev.drtheo.autojson.adapter.string;
 
 import dev.drtheo.autojson.AutoJSON;
-import dev.drtheo.autojson.schema.Schema;
+import dev.drtheo.autojson.schema.base.Schema;
 import dev.drtheo.autojson.adapter.JsonAdapter;
 import dev.drtheo.autojson.adapter.string.parser.JsonParseException;
 
@@ -45,7 +45,7 @@ public class JsonStringAdapter implements JsonAdapter<Object, String> {
     }
 
     @Override
-    public <T> Schema<T> schema(Type t) {
-        return auto.schema(t);
+    public AutoJSON auto() {
+        return auto;
     }
 }
