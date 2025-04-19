@@ -10,6 +10,7 @@ import dev.drtheo.autojson.schema.baked.BakedClassAutoSchema;
 import dev.drtheo.autojson.schema.template.*;
 import dev.drtheo.autojson.util.UnsafeUtil;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.*;
@@ -77,7 +78,9 @@ public class AutoJSON implements SchemaHolder, DelegateLogger {
     }
 
     /**
-      * @param layer the new layer(s) of this {@link AutoJSON} instance.
+     * @param layer the new layer(s) of this {@link AutoJSON} instance.
+     * @see #getLayer()
+     * @see #addLayer(int)
      */
     public void setLayer(int layer) {
         this.layer = layer;
@@ -85,6 +88,8 @@ public class AutoJSON implements SchemaHolder, DelegateLogger {
 
     /**
      * @param layer the layer(s) to add to this {@link AutoJSON} instance.
+     * @see #getLayer()
+     * @see #setLayer(int)
      */
     public void addLayer(int layer) {
         this.layer |= layer;
@@ -92,6 +97,7 @@ public class AutoJSON implements SchemaHolder, DelegateLogger {
 
     /**
      * @return the current layers of this {@link AutoJSON} instance.
+     * @apiNote Read <a href="https://theo.is-a.dev/autojson/guides/layers/">here</a> for more info about layers.
      */
     public int getLayer() {
         return layer;
@@ -115,8 +121,8 @@ public class AutoJSON implements SchemaHolder, DelegateLogger {
      * @return Whether to exclude the {@code layer}.
      * @apiNote Read <a href="https://theo.is-a.dev/autojson/guides/layers/">here</a> for more info about layers.
      */
-    public boolean shouldExclude(int layer) {
-        return layer == -1 || (this.layer & layer) == 0;
+    public boolean shouldExclude(Field field, int layer) {
+        return layer < 1 || (this.layer & layer) != 0;
     }
 
     /**

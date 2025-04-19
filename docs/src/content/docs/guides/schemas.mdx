@@ -1,0 +1,251 @@
+---
+title: Schemas
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+[`Schema`](/autojson/reference/autojson/dev.drtheo.autojson.schema.base/index.html)s
+dictate what and how everything should be serialized.
+
+### Built-in and non-built-in types
+Built-in types are: booleans, numbers and strings. Both boxed and unboxed primitives are considered built-in.
+
+### Default Types
+Some types are supported out of the box. Here's a list of them:
+- `List<T>` (via `ArrayList<T>`) - [`JavaListSchema<T>`](/autojson/reference/autojson/dev.drtheo.autojson.schema.template/-java-list-schema/index.html)
+- `Set<T>` (via `HashSet<T>`) - [`JavaSetSchema<T>`](/autojson/reference/autojson/dev.drtheo.autojson.schema.template/-java-set-schema/index.html)
+- [`Map<K, V>`](https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Map.html) (via [`HashMap<K, V>`](https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/HashMap.html), works only when the key has a [string schema](#string-schema) - [`JavaMapSchema<K, V>`](/autojson/reference/autojson/dev.drtheo.autojson.schema.template/-java-map-schema/index.html)
+- [`Map<String, V>`](https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Map.html) (via [`HashMap<String, V>`](https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/HashMap.html)) - [`String2ObjectMapSchema<V>`](/autojson/reference/autojson/dev.drtheo.autojson.schema.template/-string2-object-map-schema/index.html)
+- `T[]` (any array, including the primitives) - [`JavaArraySchema<T, E>`](/autojson/reference/autojson/dev.drtheo.autojson.schema.template/-java-array-schema/index.html)
+- [`Enum`](https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Enum.html) - [`JavaEnumSchema<T>`](/autojson/reference/autojson/dev.drtheo.autojson.schema.template/-java-enum-schema/index.html)
+- [`UUID`](https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/UUID.html) - [`UUIDSchema`](/autojson/reference/autojson/dev.drtheo.autojson.schema/-u-u-i-d-schema/index.html)
+
+`BakedClassAutoSchema` is used as a fallback for objects. Read more [here](#baked).
+
+## Registering
+
+Schemas are contained and registered in a [`SchemaHolder`](/autojson/reference/autojson/dev.drtheo.autojson/-schema-holder/index.html).
+
+To regiser a schema you need to call the appropriate `schema` method:
+
+```java "auto.schema(YourData.class, new YourDataSchema());"
+import dev.drtheo.autojson.AutoJSON;
+
+class YourClass {
+
+    void yourMethod() {
+        AutoJSON auto = new AutoJSON();
+        auto.schema(YourData.class, new YourDataSchema());
+    }
+}
+
+class YourData { }
+```
+
+<Aside type="caution">
+    Registering via the `#schema` method only works for non-generic types.
+
+    Since JVM tends does type erasure on generics, AutoJSON handles the types as
+    [reflection `Type`](https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/reflect/Type.html)s,
+    instead of [`Class<?>`](https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Class.html)s.
+
+    For classes that have generics, see [templates](#templates).
+</Aside>
+
+### Templates
+
+Templates allow you to register a template that will be used to dynamically create
+a new schema on the fly for a certain type:
+
+```java
+import dev.drtheo.autojson.AutoJSON;
+import dev.drtheo.autojson.schema.base.Schema;
+import dev.drtheo.autojson.schema.base.ObjectSchema;
+
+class YourClass {
+    void yourMethod() {
+        AutoJSON auto = new AutoJSON();
+        auto.template(User.class, MyUserSchema::new);
+    }
+}
+
+class User<T> {
+    public int id;
+    public String name;
+}
+
+class MyUserSchema<T> implements ObjectSchema<T> {
+
+    private final Class<T> tClass;
+    private final Schema<T> tSchema;
+
+    public MyUserSchema(SchemaHolder holder, ParameterizedType type) {
+        this.tClass = type.getActualTypeArguments()[0];
+        this.tSchema = holder.schema(tClass);
+    }
+
+    @Override
+    public User<T> instantiate() {
+        return new User<>();
+    }
+
+    @Override
+    public <To> void serialize(JsonAdapter<Object, To> adapter, JsonSerializationContext.Obj ctx, User<T> user) {
+        ctx.obj$put("id", user.id);
+        ctx.obj$put("name", user.name);
+    }
+
+    @Override
+    public <To> void deserialize(JsonAdapter<Object, To> adapter, JsonDeserializationContext ctx, User<T> user, String key) {
+        if (key.equals("id")) {
+            user.id = ctx.decodeBuiltIn();
+        } else if (key.equals("name") {
+            user.name = ctx.decodeBuiltIn();
+        }
+    }
+}
+```
+
+With the example above, the class `User<T>` will serialize properly.
+
+## Objects
+`ObjectSchema`s allow you serialize into a JSON object of key-value pairs:
+
+```java
+import dev.drtheo.autojson.schema.base.Schema;
+import dev.drtheo.autojson.schema.base.ObjectSchema;
+
+class Phone {
+    int[] numbers;
+}
+
+class User {
+    public int id;
+    public String name;
+
+    public Phone phone;
+}
+
+class MyUserSchema implements ObjectSchema<User> {
+
+    @Override
+    public User instantiate() {
+        return new User();
+    }
+
+    @Override
+    public <To> void serialize(JsonAdapter<Object, To> adapter, JsonSerializationContext.Obj ctx, User user) {
+        ctx.obj$put("id", user.id);
+        ctx.obj$put("name", user.name);
+        ctx.obj$put("phone", user.phone);
+    }
+
+    @Override
+    public <To> void deserialize(JsonAdapter<Object, To> adapter, JsonDeserializationContext ctx, User user, String key) {
+        if (key.equals("id")) {
+            user.id = ctx.decodeBuiltIn();
+        } else if (key.equals("name") {
+            // identical to #decodeBuiltIn()
+            user.name = ctx.decode(String.class);
+        } else if (key.equals("phone")) {
+            user.phone = ctx.decode(Phone.class);
+        }
+    }
+}
+```
+
+### Baked
+By default, `AutoJSON` will make a [`BakedClassAutoSchema`](/autojson/reference/autojson/dev.drtheo.autojson.schema.baked/-baked-class-auto-schema/index.html?query=public%20class%20BakedClassAutoSchema)
+if no schema was registered for the type.
+
+The baked schemas are always serialized as JSON objects.
+
+### String Schema
+For utility purposes there's the [`AbstractMapSchema`](/autojson/reference/autojson/dev.drtheo.autojson.schema.util/-abstract-map-schema/index.html),
+ which is used by `String2ObjectMapSchema` and `JavaMapSchema`.
+
+## Array
+`ArraySchema`s allow you to serialize your object as a JSON array.
+
+```java
+import dev.drtheo.autojson.schema.base.Schema;
+import dev.drtheo.autojson.schema.base.ArraySchema;
+
+class Phone {
+    int[] numbers;
+}
+
+class MyPhoneSchema implements ArraySchema.Simple<Phone> {
+
+    @Override
+    public Phone instantiate() {
+        return new Phone();
+    }
+
+    @Override
+    public <To> void serialize(JsonAdapter<Object, To> adapter, JsonSerializationContext.Array ctx, Phone phone) {
+        for (int i = 0; i < phone.numbers.length; i++) {
+            ctx.array$element(phone.numbers[i]);
+        }
+    }
+
+    @Override
+    public <To> void deserialize(JsonAdapter<Object, To> adapter, JsonDeserializationContext ctx, Phone phone, int i) {
+        phone[i] = ctx.decodeBuiltIn();
+    }
+}
+```
+
+It's recommended to supply the elements in the `#serialize` method from index 0 to the last one in ascending order.
+`ArraySchema`s can also have an intermediate type, for more information read the [javadoc](/autojson/reference/autojson/dev.drtheo.autojson.schema.base/-array-schema/index.html).
+
+
+## Primitive
+`PrimitiveSchema`s allow you to serialize and deserialize objects as built-in types.
+
+```java
+import dev.drtheo.autojson.schema.base.Schema;
+import dev.drtheo.autojson.schema.base.PrimitiveSchema;
+
+class Phone {
+    int[] numbers;
+
+    public Phone(int[] numbers) {
+        this.numbers = numbers;
+    }
+}
+
+class MyPhoneSchema implements PrimitiveSchema<Phone> {
+
+    @Override
+    public <To> void serialize(JsonAdapter<Object, To> adapter, JsonSerializationContext.Primitive ctx, Phone phone) {
+        String result = "";
+
+        for (int i = 0; i < phone.numbers.length - 1; i++) {
+            result += phone.numbers[i];
+            result += "-";
+        }
+
+        result += phone.numbers[phone.numbers.length - 1];
+        ctx.primitive$value(result);
+    }
+
+    @Override
+    public <To> Phone deserialize(JsonAdapter<Object, To> adapter, JsonDeserializationContext ctx) {
+        String raw = ctx.decodeBuiltIn();
+        String[] parts = raw.split("-");
+
+        int[] numbers = new int[parts.length];
+
+        for (int i = 0; i < numbers.length; i++) {
+            numbers[i] = Integer.parseInt(parts[i]);
+        }
+
+        return new Phone(numbers);
+    }
+}
+```
+
+### String Schema
+For utility purposes there's the [`StringSchema`](/autojson/reference/autojson/dev.drtheo.autojson.schema.util/-string-schema/index.html),
+ which is used by `String2ObjectMapSchema` and such.

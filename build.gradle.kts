@@ -1,4 +1,5 @@
 import org.gradle.internal.os.OperatingSystem
+import java.time.Year
 
 plugins {
     id("java")
@@ -99,6 +100,35 @@ dokka {
 
         val footerClass = "footer--link_personal"
         footerMessage.set("(c) <a class=\"$footerClass\" href=\"$personalLink\">$name</a>")
+    }
+}
+
+tasks.javadoc {
+    options {
+        this as StandardJavadocDocletOptions
+
+        tags = listOf(
+            "apiNote:a:API Note:",
+            "implSpec:a:Implementation Requirements:",
+            "implNote:a:Implementation Note:"
+        )
+
+        encoding = "UTF-8"
+        docEncoding = "UTF-8"
+        charSet = "UTF-8"
+        memberLevel = JavadocMemberLevel.PROTECTED
+
+        windowTitle = "AutoJSON API"
+        docTitle = "AutoJSON API Documentation"
+        bottom = """
+            <a href="https://theo.is-a.dev/">DrTheo_</a> © ${Year.now().value}
+        """.trimIndent()
+
+        links("https://docs.oracle.com/en/java/javase/17/docs/api/")
+    }
+
+    if (JavaVersion.current().isJava9Compatible) {
+        (options as StandardJavadocDocletOptions).addBooleanOption("html5", true)
     }
 }
 

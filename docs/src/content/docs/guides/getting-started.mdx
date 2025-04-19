@@ -1,0 +1,90 @@
+---
+title: Getting Started
+description: A guide on how to set up AutoJSON.
+---
+
+import { Tabs, TabItem, Code } from '@astrojs/starlight/components';
+
+This guide should help you to set up AutoJSON. For the overall documentation,
+check the [JavaDocs](/autojson/reference/) (or, well, Dokka).
+
+## Setting up the dependency
+
+First, you have to add my maven repository and the dependency:
+
+<Tabs>
+  <TabItem label="Gradle (Kotlin)">
+    ```kts
+    repositories {
+        // other repositories
+        maven("https://theo.is-a.dev/maven-repo/")
+    }
+
+    dependencies {
+        // other dependencies
+        implementation("dev.drtheo:autojson:[INSERT VERSION HERE]")
+    }
+    ```
+  </TabItem>
+  <TabItem label="Gradle (Groovy)">
+    ```kts
+    repositories {
+        // other repositories
+        maven {
+            url "https://theo.is-a.dev/maven-repo/"
+        }
+    }
+
+    dependencies {
+        // other dependencies
+        implementation "dev.drtheo:autojson:[INSERT VERSION HERE]"
+    }
+    ```
+  </TabItem>
+  <TabItem label="Maven">
+  ```xml
+  <repositories>
+      <!-- Other repositories -->
+      <repository>
+          <id>drtheo-repo</id>
+          <name>DrTheo's Repo</name>
+          <url>https://theo.is-a.dev/maven-repo/</url>
+      </repository>
+  </repositories>
+
+  <dependencies>
+      <dependency>
+          <groupId>dev.drtheo</groupId>
+          <artifactId>autojson</artifactId>
+          <version>[INSERT VERSION HERE]</version>
+      </dependency>
+  </dependencies>
+  ```
+  </TabItem>
+</Tabs>
+
+## Using AutoJSON
+
+Now you can import AutoJSON in your project. First, you have to set up
+the AutoJSON instance.
+
+```java
+import dev.drtheo.autojson.AutoJSON;
+
+class YourClass {
+
+    public void someMethod() {
+        AutoJSON auto = new AutoJSON();
+        auto.setLayer(2); // 0 by default; sets the current layer.
+        auto.setLogMissingEntries(false); // true by default.
+        auto.setSafeInstancing(true); // false by default.
+    }
+}
+```
+
+You can also customize it, as seen in the example above!
+
+## See Also:
+- [Layers](/autojson/guides/layers/)
+- [Logging](/autojson/guides/logging/)
+- [Schemas](/autojson/guides/schemas/)

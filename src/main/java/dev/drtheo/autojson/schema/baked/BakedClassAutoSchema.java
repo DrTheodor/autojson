@@ -48,7 +48,7 @@ public class BakedClassAutoSchema<T> implements ObjectSchema<T> {
 
             Exclude exclude = field.getAnnotation(Exclude.class);
 
-            if (exclude != null && auto.shouldExclude(exclude.layer()))
+            if (exclude != null && auto.shouldExclude(field, exclude.layer()))
                 continue;
 
             FieldType<T, ?> type = FieldType.from(auto, field);
