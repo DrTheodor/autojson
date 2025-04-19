@@ -71,7 +71,7 @@ dokka {
     moduleName.set("autojson")
 
     dokkaPublications.html {
-        outputDirectory.set(docsFolder.dir("dokka"))
+        outputDirectory.set(docsFolder.dir("reference"))
         suppressInheritedMembers.set(true)
         failOnWarning.set(true)
     }
