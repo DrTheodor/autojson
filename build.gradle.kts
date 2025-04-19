@@ -4,6 +4,7 @@ import java.time.Year
 plugins {
     id("java")
     id("me.champeau.jmh") version "0.7.2"
+    id("org.jetbrains.dokka") version "2.0.0"
     id("maven-publish")
 }
 
@@ -58,7 +59,42 @@ task("justPublish") {
     dependsOn(tasks["publishLibPublicationToGhRepository"])
 }
 
+dokka {
+    val docsFolder = layout.projectDirectory.dir("docs").dir("public")
+
+    moduleName.set("AutoJSON")
+
+    dokkaPublications.html {
+        outputDirectory.set(docsFolder.dir("dokka"))
+        suppressInheritedMembers.set(true)
+        failOnWarning.set(true)
+    }
+
+    dokkaSourceSets.configureEach {
+        includes.from("README.md")
+        jdkVersion.set(17)
+
+        externalDocumentationLinks.register("jdk17") {
+            url("https://docs.oracle.com/en/java/javase/17/docs/api/")
+            packageListUrl("https://docs.oracle.com/en/java/javase/17/docs/api/element-list")
+        }
+
+        sourceLink {
+            localDirectory.set(file("src/main/java"))
+            remoteUrl("https://github.com/DrTheodor/autojson/blob/main/")
+            remoteLineSuffix.set("#L")
+        }
+    }
+    pluginsConfiguration.html {
+        //customStyleSheets.from("styles.css")
+        //customAssets.from("logo.png")
+        footerMessage.set("(c) DrTheo_")
+    }
+}
+
 tasks.javadoc {
+    val docsFolder = layout.projectDirectory.dir("docs").dir("public")
+
     options {
         this as StandardJavadocDocletOptions
 
@@ -80,13 +116,15 @@ tasks.javadoc {
         """.trimIndent()
 
         links("https://docs.oracle.com/en/java/javase/17/docs/api/")
+
+        addStringOption("stylesheetfile", docsFolder.file("javadocs.css").asFile.absolutePath)
     }
 
     if (JavaVersion.current().isJava9Compatible) {
         (options as StandardJavadocDocletOptions).addBooleanOption("html5", true)
     }
 
-    setDestinationDir(layout.projectDirectory.dir("docs").dir("public").dir("javadocs").asFile)
+    setDestinationDir(docsFolder.dir("javadocs").asFile)
 }
 
 tasks["publishLibPublicationToGhRepository"].finalizedBy("pushMavenRepo")
