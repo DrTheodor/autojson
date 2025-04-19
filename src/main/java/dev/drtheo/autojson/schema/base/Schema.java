@@ -6,7 +6,7 @@ import dev.drtheo.autojson.util.UnsafeUtil;
 
 /**
  * The base schema class.
- * </br>
+ * <br>
  * You should probably implement {@link ObjectSchema}, {@link ArraySchema},
  * {@link PrimitiveSchema}, {@link WrapperSchema} or one of their derivatives instead.
  *
@@ -28,7 +28,7 @@ public sealed interface Schema<T> permits ArraySchema, ObjectSchema, PrimitiveSc
 
     /**
      * The type of the schema.
-     * </br>
+     * <br>
      * Instead of doing if-instanceof checks for the schema implementations,
      * the adapters should use the {@link SchemaType} with a switch statement instead.
      *
