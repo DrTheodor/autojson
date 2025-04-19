@@ -1,5 +1,6 @@
 package dev.drtheo.autojson.adapter;
 
+import dev.drtheo.autojson.AutoJSON;
 import dev.drtheo.autojson.schema.PrimitiveSchema;
 import dev.drtheo.autojson.schema.Schema;
 
@@ -48,7 +49,7 @@ public interface JsonSerializationContext extends JsonContext {
         default <T> void primitive$value(T value, Type type) {
             Schema<T> schema = schema(type);
 
-            if (schema != null && !(schema instanceof PrimitiveSchema<T>))
+            if (!AutoJSON.isBuiltIn(type) && !(schema instanceof PrimitiveSchema<T>))
                 throw new IllegalArgumentException("Schema " + schema + " is not a primitive schema");
 
             primitive$value(value, type, (PrimitiveSchema<T>) schema);

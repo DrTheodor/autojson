@@ -1,4 +1,4 @@
-package dev.drtheo.autojson.schema.impl;
+package dev.drtheo.autojson.schema.impl.template;
 
 import dev.drtheo.autojson.adapter.JsonAdapter;
 import dev.drtheo.autojson.adapter.JsonDeserializationContext;

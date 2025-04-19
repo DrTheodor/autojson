@@ -35,7 +35,7 @@ public class JsonStringParser implements JsonDeserializationContext {
         if (schema instanceof ArraySchema<T, ?> arr)
             return (T) parser.deserializeArray(arr);
 
-        if (type == null || AutoJSON.isPrimitive(type)) {
+        if (type == null || AutoJSON.isBuiltIn(type)) {
             if (schema instanceof PrimitiveSchema<T> ps)
                 return parser.deserializePrimitive(ps);
 
@@ -134,7 +134,7 @@ public class JsonStringParser implements JsonDeserializationContext {
         if (this.current == ARRAY_MARKER && fieldSchema instanceof ArraySchema<T, ?> arraySchema)
             return (T) deserializeArray(reader.peekToken(), arraySchema);
 
-        if (type == null || AutoJSON.isPrimitive(type)) {
+        if (type == null || AutoJSON.isBuiltIn(type)) {
             if (fieldSchema instanceof PrimitiveSchema<T> ps)
                 return deserializePrimitive(ps);
 

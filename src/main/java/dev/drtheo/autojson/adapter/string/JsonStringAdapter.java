@@ -17,7 +17,7 @@ public class JsonStringAdapter implements JsonAdapter<Object, String> {
 
     @Override
     public <T> String toJson(T obj, Type type) {
-        if (AutoJSON.isPrimitive(type))
+        if (AutoJSON.isBuiltIn(type))
             return obj.toString();
 
         JsonStringBuilder ctx = new JsonStringBuilder(this);
