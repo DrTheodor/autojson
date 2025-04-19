@@ -63,6 +63,8 @@ task("justPublish") {
 
 dokka {
     val docsFolder = layout.projectDirectory.dir("docs").dir("public")
+    val assets = layout.projectDirectory.dir("assets")
+    val dokkaAssets = assets.dir("dokka")
 
     moduleName.set("autojson")
 
@@ -88,8 +90,8 @@ dokka {
         }
     }
     pluginsConfiguration.html {
-        //customStyleSheets.from("styles.css")
-        customAssets.from(docsFolder.file("logo-icon.svg"))
+        customStyleSheets.from(dokkaAssets.file("dokka.css"))
+        customAssets.from(dokkaAssets.file("logo-icon-white.svg"), dokkaAssets.file("logo-icon.svg"))
         footerMessage.set("(c) DrTheo_")
     }
 }
