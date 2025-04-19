@@ -21,6 +21,8 @@ dependencies {
 
     jmh("com.google.code.gson:gson:2.8.9")
 
+    dokkaHtmlPlugin("org.jetbrains.dokka:kotlin-as-java-plugin:2.0.0")
+
     compileOnly("org.jetbrains:annotations:26.0.2")
 }
 
@@ -62,7 +64,7 @@ task("justPublish") {
 dokka {
     val docsFolder = layout.projectDirectory.dir("docs").dir("public")
 
-    moduleName.set("AutoJSON")
+    moduleName.set("autojson")
 
     dokkaPublications.html {
         outputDirectory.set(docsFolder.dir("dokka"))
@@ -87,7 +89,7 @@ dokka {
     }
     pluginsConfiguration.html {
         //customStyleSheets.from("styles.css")
-        //customAssets.from("logo.png")
+        customAssets.from(docsFolder.file("logo-image.svg"))
         footerMessage.set("(c) DrTheo_")
     }
 }
