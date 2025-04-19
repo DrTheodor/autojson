@@ -1,3 +1,5 @@
+import org.gradle.internal.os.OperatingSystem
+
 plugins {
     id("java")
     id("me.champeau.jmh") version "0.7.2"
@@ -5,7 +7,7 @@ plugins {
 }
 
 group = "dev.drtheo"
-version = "0.0.10"
+version = "0.0.10-dev.1"
 
 repositories {
     mavenCentral()
@@ -25,6 +27,11 @@ tasks.test {
     useJUnitPlatform()
 }
 
+java {
+    withSourcesJar()
+    withJavadocJar()
+}
+
 publishing {
     publications {
         create<MavenPublication>("lib") {
@@ -40,9 +47,19 @@ publishing {
     }
 }
 
-task<Exec>("pushRepo") {
+task<Exec>("pushMavenRepo") {
+    val suffix = if (OperatingSystem.current().isWindows) "bat" else "sh"
     val path = layout.projectDirectory.dir("../maven-repo")
-    commandLine("$path/deploy.bat")
+    commandLine("$path/deploy.$suffix")
 }
 
-tasks["publishLibPublicationToGhRepository"].finalizedBy("pushRepo")
+task("justPublish") {
+    dependsOn(tasks.javadoc)
+    dependsOn(tasks["publishLibPublicationToGhRepository"])
+}
+
+tasks.javadoc {
+    setDestinationDir(layout.projectDirectory.dir("docs").dir("public").asFile)
+}
+
+tasks["publishLibPublicationToGhRepository"].finalizedBy("pushMavenRepo")
