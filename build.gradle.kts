@@ -26,6 +26,14 @@ dependencies {
     compileOnly("org.jetbrains:annotations:26.0.2")
 }
 
+val jmhIncludes: Any? = findProperty("jmhIncludes")
+
+jmh {
+    if (jmhIncludes != null) {
+        includes.set(listOf(jmhIncludes.toString()))
+    }
+}
+
 tasks.test {
     useJUnitPlatform()
 }

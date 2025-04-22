@@ -3,7 +3,6 @@ package dev.drtheo.autojson.adapter.string.parser;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
-import java.util.*;
 
 public class JsonReader {
 
@@ -22,12 +21,9 @@ public class JsonReader {
     private int depth;
     private final Boolean[] objectStack = new Boolean[32];
 
-    private Token currentToken;
-
     public JsonReader(String raw) {
         this.reader = new StringReader(raw);
-        //this.advance();
-        //this.nextToken();
+        this.fillBuffer();
     }
 
     private void fillBuffer() {
@@ -119,7 +115,7 @@ public class JsonReader {
                     case '-', '+', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9' ->
                             new Token(TokenType.NUMBER, this.parseNumber());
 
-                    default -> throw syntaxError("Unexpected token '" + this.currentChar + "'");
+                    default -> throw syntaxError("Unexpected token '" + (char) this.currentChar + "'");
                 };
 
                 this.expectsValue = !isMapped;
@@ -132,27 +128,7 @@ public class JsonReader {
     }
 
     public Token nextToken() {
-        Token t = this.nextToken0();
-        this.currentToken = t;
-        return t;
-    }
-
-    public Token peekToken() {
-        return currentToken;
-    }
-
-    private String parseString() {
-        consume('"'); // opening quote
-        int start = pos - 1;
-
-        while (currentChar != '"') {
-            advance();
-        }
-
-        String result = new String(buffer, start, pos - 1 - start);
-
-        consume('"'); // closing quote
-        return result;
+        return this.nextToken0();
     }
 
     private Object parseNull() {
@@ -181,19 +157,66 @@ public class JsonReader {
         }
     }
 
+    private String parseString() {
+        consume('"'); // opening quote
+        int start = pos;
+
+        StringBuilder res = null;
+
+        while (currentChar != '"') {
+            if (pos == limit) {
+                res = new StringBuilder();
+                res.append(buffer, start - 1, pos - start);
+                start = 1;
+            }
+
+            advance();
+        }
+
+        String segment = new String(buffer, start - 1, pos - start);
+        String returning;
+
+        if (res != null) {
+            res.append(segment);
+            returning = res.toString();
+        } else {
+            returning = segment;
+        }
+
+        consume('"'); // closing quote
+        return returning;
+    }
+
     private LazilyParsedNumber parseNumber() {
-        int start = pos - 1;
-        int len = 0;
+        int start = pos;
+
+        StringBuilder res = null;
 
         while ((currentChar >= '0' && currentChar <= '9') || currentChar == '.'
                 || currentChar == 'e' || currentChar == 'E'
                 || currentChar == '+' || currentChar == '-') {
+            if (pos == limit) {
+                if (res == null)
+                    res = new StringBuilder();
+                res.append(buffer, start - 1, pos - start + 1);
+                start = 1;
+            }
+
             advance();
-            len++;
         }
 
-        String result = new String(buffer, start, len);
-        return new LazilyParsedNumber(result);
+        String returning;
+
+        if (res != null) {
+            if (pos > start)
+                res.append(buffer, 0, pos - start);
+
+            returning = res.toString();
+        } else {
+            returning = new String(buffer, start - 1, pos - start);
+        }
+
+        return new LazilyParsedNumber(returning);
     }
 
     private void skipWhitespace() {
@@ -248,69 +271,5 @@ public class JsonReader {
 
     private JsonSyntaxException syntaxError(String message) {
         return new JsonSyntaxException(message + " at line " + line + " column " + (pos - lineStart));
-    }
-
-    public static void main(String[] args) {
-        String json = "{\"name\":\"John\",\"age\":30,\"isActive\":true,\"address\":null,\"scores\":[90,85,95],\"profile\":{\"height\":180,\"weight\":75}}";
-
-        JsonReader parser = new JsonReader(json);
-        Map<String, Object> o = create();
-
-        parser.beginObject();
-        deserializeObject(o, parser);
-    }
-
-    private static Object deserializeObject(Map<String, Object> o, JsonReader reader) {
-        while (reader.hasNext()) {
-            Token name = reader.nextToken();
-
-            if (name.type() == TokenType.END_OBJECT)
-                break;
-
-            Token value = reader.nextToken();
-            deserializeField((String) name.value, value, o, reader);
-        }
-
-        return o;
-    }
-
-    private static void deserializeField(String name, Token value, Map<String, Object> o, JsonReader reader) {
-        Object v = switch (value.type()) {
-            case BEGIN_ARRAY -> deserializeList(reader);
-            case BEGIN_OBJECT -> deserializeObject(create(name), reader);
-            case NUMBER, STRING, BOOL, NULL -> value.value;
-
-            default -> throw new IllegalStateException(value.type().toString());
-        };
-
-        deserialize(o, name, v);
-    }
-
-    private static List<Object> deserializeList(JsonReader reader) {
-        List<Object> result = new ArrayList<>();
-
-        while (reader.hasNext()) {
-            Token t = reader.nextToken();
-
-            if (t.type == TokenType.END_ARRAY)
-                return result;
-
-            result.add(t.value);
-        }
-
-        return result;
-    }
-
-    private static void deserialize(Map<String, Object> obj, String field, Object value) {
-        obj.put(field, value);
-        System.out.println("Setting field '" + field + "' of " + obj + " to '" + value + "'");
-    }
-
-    private static Map<String, Object> create(String field) {
-        return new HashMap<>();
-    }
-
-    private static Map<String, Object> create() {
-        return new HashMap<>();
     }
 }

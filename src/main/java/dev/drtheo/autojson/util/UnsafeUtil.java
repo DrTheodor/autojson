@@ -4,8 +4,10 @@ import sun.misc.Unsafe;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Type;
+import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
+import java.util.function.Predicate;
 
 public class UnsafeUtil {
 
@@ -208,5 +210,17 @@ public class UnsafeUtil {
             throw new NumberFormatException("Value out of range for byte: " + val);
         }
         return (byte)val;
+    }
+
+    public static void getAllFields(List<Field> list, Class<?> clazz, Predicate<Field> filter) {
+        for (Field field : clazz.getDeclaredFields()) {
+            if (filter.test(field))
+                list.add(field);
+        }
+
+        Class<?> superClass = clazz.getSuperclass();
+
+        if (superClass != Object.class && superClass != null)
+            getAllFields(list, superClass, filter);
     }
 }

@@ -25,6 +25,11 @@ public class JavaEnumSchema<T extends Enum<T>> implements PrimitiveSchema<T> {
 
     @Override
     public <To> T deserialize(JsonAdapter<Object, To> auto, JsonDeserializationContext c) {
-        return Enum.valueOf(enumClass, c.decodeBuiltIn());
+        String s = c.decodeBuiltIn();
+
+        if (s == null)
+            return null;
+
+        return Enum.valueOf(enumClass, s);
     }
 }

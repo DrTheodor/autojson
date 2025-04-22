@@ -63,6 +63,8 @@ public class JavaArraySchema<T, E> implements ArraySchema<T, List<E>> {
 
         Object array = Array.newInstance(elementClass, size);
 
+        System.out.println(l);
+
         for (int i = 0; i < size; i++) {
             this.adapter.setArray(array, i, l.get(i));
         }

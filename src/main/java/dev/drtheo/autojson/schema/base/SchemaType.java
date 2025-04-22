@@ -4,4 +4,5 @@ public enum SchemaType {
     PRIMITIVE,
     ARRAY,
     OBJECT,
+    WRAPPER,
 }

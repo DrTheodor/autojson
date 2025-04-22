@@ -2,14 +2,18 @@
 title: Benchmark
 ---
 
-| Benchmark                    | Mode | Cnt |     Score | Error     | Units |
-|------------------------------|:----:|:---:|----------:|-----------|:-----:|
-| AITBenchmark.autoSerialize   | avgt |  10 |  3467.611 | ± 211.629 | ms/op |
-| AITBenchmark.gsonSerialize   | avgt |  10 | 31903.850 | ± 79.404  | ms/op |
-| ToJsonBenchmarks.autoObj2Str | avgt |  10 |  6359.892 | ± 12.770  | ms/op |
-| ToJsonBenchmarks.gsonObj2Str | avgt |  10 | 11846.072 | ± 103.042 | ms/op |
-| ToObjBenchmarks.autoStr2Obj  | avgt |  10 |  3220.653 | ± 5.248   | ms/op |
-| ToObjBenchmarks.gsonStr2Obj  | avgt |  10 |  4729.724 | ± 63.249  | ms/op |
+| Benchmark                             | Mode | Cnt |  Score |   Error | Units |
+|---------------------------------------|:----:|:---:|-------:|--------:|-------|
+| ToJsonBenchmarks.autoSerialize        | avgt | 10  |  6.487 | ± 0.054 | ms/op |
+| ToJsonBenchmarks.gsonSerialize        | avgt | 10  | 12.033 | ± 0.159 | ms/op |
+| ToObjBenchmarks.autoDeserialize       | avgt | 10  |  2.928 | ± 0.008 | ms/op |
+| ToObjBenchmarks.gsonDeserialize       | avgt | 10  |  5.177 | ± 0.090 | ms/op |
+| ait.ToJsonAITBenchmark.autoSerialize  | avgt | 10  |  8.621 | ± 0.060 | ms/op |
+| ait.ToJsonAITBenchmark.gsonSerialize  | avgt | 10  | 36.254 | ± 0.182 | ms/op |
+| ait.ToObjAITBenchmark.autoDeserialize | avgt | 10  | 25.977 | ± 0.194 | ms/op |
+| ait.ToObjAITBenchmark.gsonDeserialize | avgt | 10  | 50.200 | ± 0.549 | ms/op |
 
-(lower score is better)
-Benchmarked on `16.04.25`.
+(Ran x1000 times)
+Benchmarked on `<fill me later>`.
+
+![Performance comparison bar chart](../../assets/performance.png)

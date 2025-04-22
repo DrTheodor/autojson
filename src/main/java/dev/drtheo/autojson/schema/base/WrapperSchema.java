@@ -1,7 +1,8 @@
 package dev.drtheo.autojson.schema.base;
 
 import dev.drtheo.autojson.adapter.JsonAdapter;
-import dev.drtheo.autojson.adapter.JsonSerializationContext;
+
+import java.lang.reflect.Type;
 
 /**
  * One of the base implementations of the {@link Schema} class.
@@ -9,35 +10,34 @@ import dev.drtheo.autojson.adapter.JsonSerializationContext;
  *
  * @param <T> the type this schema serializes.
  */
-public non-sealed interface WrapperSchema<T> extends Schema<T> {
+public non-sealed interface WrapperSchema<T, B> extends Schema<T> {
 
     @Override
-    default ObjectSchema<T> asObject() {
+    default <S> ObjectSchema<S> asObject() {
         return this.child().asObject();
     }
 
     @Override
-    default ArraySchema<T, ?> asArray() {
+    default <S> ArraySchema<S, ?> asArray() {
         return this.child().asArray();
     }
 
     @Override
-    default PrimitiveSchema<T> asPrimitive() {
+    default <S> PrimitiveSchema<S> asPrimitive() {
         return this.child().asPrimitive();
     }
 
     @Override
     default SchemaType type() {
-        return child().type();
+        return SchemaType.WRAPPER;
     }
 
-    @Override
-    default <To> JsonSerializationContext.Built serialize(JsonAdapter<Object, To> adapter, JsonSerializationContext ctx, T t) {
-        return child().serialize(adapter, ctx, t);
-    }
+    Type wrapping();
+
+    <To> T deserialize(JsonAdapter<Object, To> adapter, B t);
 
     /**
      * @return the child schema this wrapper schema wraps around.
      */
-    Schema<T> child();
+    Schema<B> child();
 }

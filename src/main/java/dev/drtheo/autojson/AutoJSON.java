@@ -1,6 +1,7 @@
 package dev.drtheo.autojson;
 
 import dev.drtheo.autojson.adapter.JsonAdapter;
+import dev.drtheo.autojson.adapter.string.parser.LazilyParsedNumber;
 import dev.drtheo.autojson.logger.DelegateLogger;
 import dev.drtheo.autojson.logger.Logger;
 import dev.drtheo.autojson.logger.SystemLogger;
@@ -20,10 +21,10 @@ import java.util.function.Function;
 public class AutoJSON implements SchemaHolder, DelegateLogger {
 
     /**
-     * @return {@code true} when the {@code type} is a primitive (boxed or not) or if it's a {@link String}.
+     * @return {@code true} when the {@code type} is a primitive (boxed or not) or if it's a {@link String} or a {@link LazilyParsedNumber}.
      */
     public static boolean isBuiltIn(Type type) {
-        return UnsafeUtil.isPrimitive(type) || type == String.class;
+        return UnsafeUtil.isPrimitive(type) || type == String.class || type == LazilyParsedNumber.class;
     }
 
     private final Map<Type, Schema<?>> schemas = new HashMap<>();
@@ -190,14 +191,14 @@ public class AutoJSON implements SchemaHolder, DelegateLogger {
         }
 
         if (type instanceof ParameterizedType parameterized) {
-            if (parameterized.getRawType() == Set.class)
+            if (parameterized.getRawType() == Set.class || parameterized.getRawType() == HashSet.class)
                 return (Schema<T>) new JavaSetSchema<>(this, parameterized);
 
             // since the templates map can't allow for one key having multiple values, this is a bit of a hack.
             if (parameterized.getRawType() == Map.class && parameterized.getActualTypeArguments()[0] == String.class)
                 return (Schema<T>) new String2ObjectMapSchema<>(this, parameterized);
 
-            if (parameterized.getRawType() == List.class)
+            if (parameterized.getRawType() == List.class || parameterized.getRawType() == ArrayList.class)
                 return (Schema<T>) new JavaListSchema<>(this, parameterized);
 
             TemplateCreator<?> creator = this.templates.get(parameterized.getRawType());

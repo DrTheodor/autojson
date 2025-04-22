@@ -17,9 +17,7 @@ import dev.drtheo.autojson.util.UnsafeUtil;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Type;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 public class BakedClassAutoSchema<T> implements ObjectSchema<T> {
 
@@ -34,23 +32,23 @@ public class BakedClassAutoSchema<T> implements ObjectSchema<T> {
         if (options != null)
             safeInstance = options.safe();
 
-        Field[] fields = clazz.getDeclaredFields();
-        FieldType<T, ?>[] types = new FieldType[fields.length];
+        List<Field> fields = new ArrayList<>();
+
+        UnsafeUtil.getAllFields(fields, clazz, field -> {
+            if (Modifier.isStatic(field.getModifiers()))
+                return false;
+
+            Exclude exclude = field.getAnnotation(Exclude.class);
+            return exclude == null || !auto.shouldExclude(field, exclude.layer());
+        });
+
+        FieldType<T, ?>[] types = new FieldType[fields.size()];
 
         // maybe use a linkedhashmap?
         Map<String, FieldType<T, ?>> map = new HashMap<>(types.length);
 
-        for (int i = 0; i < fields.length; i++) {
-            Field field = fields[i];
-
-            if (Modifier.isStatic(field.getModifiers()))
-                continue;
-
-            Exclude exclude = field.getAnnotation(Exclude.class);
-
-            if (exclude != null && auto.shouldExclude(field, exclude.layer()))
-                continue;
-
+        for (int i = 0; i < types.length; i++) {
+            Field field = fields.get(i);
             FieldType<T, ?> type = FieldType.from(auto, field);
 
             types[i] = type;
@@ -67,7 +65,8 @@ public class BakedClassAutoSchema<T> implements ObjectSchema<T> {
             Type type = field.getGenericType();
             ClassAdapter<E, E[]> adapter = (ClassAdapter<E, E[]>) ClassAdapter.match(type);
 
-            TypeHint hint = field.getAnnotation(TypeHint.class);
+            // TODO: TypeHints
+            //TypeHint hint = field.getAnnotation(TypeHint.class);
             Lazy<Schema<E>> schema = new Lazy<>(() -> holder.schema(type));
 
             // FIXME @TypeHint

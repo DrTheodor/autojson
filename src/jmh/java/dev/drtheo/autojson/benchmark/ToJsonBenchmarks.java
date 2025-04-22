@@ -8,14 +8,14 @@ import org.openjdk.jmh.infra.Blackhole;
 public class ToJsonBenchmarks extends AutoVsGsonBenchmark {
 
     @Benchmark
-    public void gsonObj2Str(Blackhole blackhole) {
+    public void gsonSerialize(Blackhole blackhole) {
         for (int i = 0; i < iters; i++) {
             blackhole.consume(gson.toJson(bean));
         }
     }
 
     @Benchmark
-    public void autoObj2Str(Blackhole blackhole) {
+    public void autoSerialize(Blackhole blackhole) {
         for (int i = 0; i < iters; i++) {
             blackhole.consume(adapter.toJson(bean));
         }

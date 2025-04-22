@@ -14,6 +14,9 @@ public class UUIDSchema implements StringSchema<UUID> {
 
     @Override
     public <To> UUID deserialize(JsonAdapter<Object, To> auto, String s) {
+        if (s == null)
+            return null;
+
         return UUID.fromString(s);
     }
 }

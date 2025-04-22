@@ -4,6 +4,7 @@ import dev.drtheo.autojson.AutoJSON;
 import dev.drtheo.autojson.adapter.JsonDeserializationContext;
 import dev.drtheo.autojson.adapter.string.parser.JsonReader;
 import dev.drtheo.autojson.schema.base.*;
+import dev.drtheo.autojson.util.ClassAdapter;
 import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.Type;
@@ -12,39 +13,69 @@ public class JsonStringParser implements JsonDeserializationContext {
 
     private static final Object OBJ_MARKER = new Object();
     private static final Object ARRAY_MARKER = new Object();
+    private static final Object NONE = new Object();
 
     private final JsonStringAdapter adapter;
     private final JsonReader reader;
 
-    private Object current;
+    private Object current = NONE;
 
     public JsonStringParser(JsonStringAdapter adapter, String raw) {
         this.adapter = adapter;
         this.reader = new JsonReader(raw);
     }
 
-    @SuppressWarnings("unchecked")
     public static <T> T process(JsonStringAdapter adapter, String raw, Type type) {
         JsonStringParser parser = new JsonStringParser(adapter, raw);
         Schema<T> schema = adapter.schema(type);
 
-        if (schema.type() == SchemaType.OBJECT)
-            return parser.deserializeObject(schema.asObject());
+        return parser.processSchema(schema, type);
+    }
 
-        if (schema.type() == SchemaType.ARRAY)
-            return (T) parser.deserializeArray(schema.asArray());
+    @SuppressWarnings("unchecked")
+    private <T> T processSchema(Schema<T> schema, Type type) {
+        if (schema == null) {
+            if (AutoJSON.isBuiltIn(type)) {
+                this.setValue(reader.nextToken());
 
-        if (AutoJSON.isBuiltIn(type)) {
-            if (schema.type() == SchemaType.PRIMITIVE)
-                return parser.deserializePrimitive(schema.asPrimitive());
+                T t = this.decodeBuiltIn();
 
-            return parser.deserializePrimitive();
+                if (ClassAdapter.matchUnboxed(type) instanceof ClassAdapter.Wrapped<?,?,?> wrapped)
+                    return (T) unwrap(t, wrapped);
+
+                return t;
+            }
+
+            throw new IllegalArgumentException("No schema for class: " + type.getTypeName());
         }
 
-        throw new IllegalArgumentException("No schema for class: " + type.getTypeName());
+        if (schema.type() == SchemaType.OBJECT)
+            return this.deserializeObject(schema.asObject());
+
+        if (schema.type() == SchemaType.ARRAY)
+            return (T) this.deserializeArray(schema.asArray());
+
+        if (schema.type() == SchemaType.WRAPPER)
+            return this.deserializeWrapper(schema.asWrapper());
+
+        if (schema.type() == SchemaType.PRIMITIVE)
+            return this.deserializePrimitive(schema.asPrimitive());
+
+        throw new IllegalStateException("Unreachable");
+    }
+
+    @SuppressWarnings("unchecked")
+    private static <T, B> T unwrap(Object value, ClassAdapter.Wrapped<T, ?, B> wrapped) {
+        return wrapped.unwrap((B) value);
+    }
+
+    private <T, B> T deserializeWrapper(WrapperSchema<T, B> wrapper) {
+        B b = this.decode(wrapper.wrapping(), wrapper.child());
+        return wrapper.deserialize(this.adapter, b);
     }
 
     private <T> T deserializeObject(ObjectSchema<T> o) {
+        current = NONE;
         T t = o.instantiate();
 
         while (reader.hasNext()) {
@@ -65,13 +96,10 @@ public class JsonStringParser implements JsonDeserializationContext {
         return t;
     }
 
-    private <T> Object deserializeArray(ArraySchema<T, ?> o) {
-        return deserializeArray(reader.nextToken(), o);
-    }
-
-    private <T, Intr> Object deserializeArray(JsonReader.Token start, ArraySchema<T, Intr> o) {
-        if (start.type() != JsonReader.TokenType.BEGIN_ARRAY)
-            throw new IllegalStateException("Not an array");
+    private <T, Intr> Object deserializeArray(ArraySchema<T, Intr> o) {
+        if (current != ARRAY_MARKER)
+            reader.nextToken();
+        current = NONE;
 
         Intr t = o.instantiate();
         int i = 0;
@@ -90,13 +118,10 @@ public class JsonStringParser implements JsonDeserializationContext {
     }
 
     private <T> T deserializePrimitive(PrimitiveSchema<T> o) {
-        this.setValue(reader.nextToken());
-        return o.deserialize(this.adapter, this);
-    }
+        if (this.current == NONE)
+            this.setValue(reader.nextToken());
 
-    private <T> T deserializePrimitive() {
-        this.setValue(reader.nextToken());
-        return decodeBuiltIn();
+        return o.deserialize(this.adapter, this);
     }
 
     private void setValue(JsonReader.Token value) {
@@ -123,7 +148,10 @@ public class JsonStringParser implements JsonDeserializationContext {
     @Override
     @SuppressWarnings("unchecked")
     public <T> T decodeBuiltIn() {
-        return (T) current;
+        Object o = current;
+        current = NONE;
+
+        return (T) o;
     }
 
     @Override
@@ -133,10 +161,13 @@ public class JsonStringParser implements JsonDeserializationContext {
             return deserializeObject(fieldSchema.asObject());
 
         if (this.current == ARRAY_MARKER && fieldSchema.type() == SchemaType.ARRAY)
-            return (T) deserializeArray(reader.peekToken(), fieldSchema.asArray());
+            return (T) deserializeArray(fieldSchema.asArray());
 
         if (fieldSchema.type() == SchemaType.PRIMITIVE)
             return deserializePrimitive(fieldSchema.asPrimitive());
+
+        if (fieldSchema.type() == SchemaType.WRAPPER)
+            return deserializeWrapper(fieldSchema.asWrapper());
 
         throw new IllegalStateException("No schema for class " + type.getTypeName());
     }

@@ -60,6 +60,25 @@ public interface JsonDeserializationContext extends JsonContext {
     }
 
     /**
+     * Decodes a custom value in the current context.
+     *
+     * @implNote Should only be used for non-built-in objects!
+     *
+     * @param type the type of the object to decode.
+     * @return The decoded object.
+     * @param <T> the type of the object.
+     * @throws NullPointerException if the schema is null.
+     */
+    default <T> T decodeCustom(Type type) {
+        Schema<T> schema = schema(type);
+
+        if (schema == null)
+            throw new NullPointerException("Tried to use decodeCustom with no schema!");
+
+        return decodeCustom(type, schema);
+    }
+
+    /**
      * Decodes the value in the current context.
      *
      * @implNote Should only be used for non-built-in objects!

@@ -63,6 +63,37 @@ public interface ClassAdapter<T, Array> {
         throw new IllegalArgumentException("Unsupported primitive type: " + type);
     }
 
+    static ClassAdapter<?, ?> matchUnboxed(Type type) {
+        if (!(type instanceof Class<?> c))
+            return OBJECT;
+
+        if (c == Boolean.TYPE || c == Boolean.class)
+            return BOOL;
+
+        if (c == Byte.TYPE || c == Byte.class)
+            return BYTE;
+
+        if (c == Short.TYPE || c == Short.class)
+            return SHORT;
+
+        if (c == Character.TYPE || c == Character.class)
+            return CHAR;
+
+        if (c == Integer.TYPE || c == Integer.class)
+            return INT;
+
+        if (c == Float.TYPE || c == Float.class)
+            return FLOAT;
+
+        if (c == Double.TYPE || c == Double.class)
+            return DOUBLE;
+
+        if (c == Long.TYPE || c == Long.class)
+            return LONG;
+
+        return OBJECT;
+    }
+
     abstract class Primitive<T, Array> implements ClassAdapter<T, Array> {
         private final T def;
 
@@ -106,7 +137,7 @@ public interface ClassAdapter<T, Array> {
             this.base = base;
         }
 
-        protected abstract T unwrap(B b);
+        public abstract T unwrap(B b);
 
         @Override
         public void set(Unsafe unsafe, Object obj, long address, T value) {
@@ -132,21 +163,21 @@ public interface ClassAdapter<T, Array> {
         }
     }
 
-    ClassAdapter<Boolean, boolean[]> BOOL = new BooleanClassAdapter();
+    ClassAdapter<Boolean, boolean[]> BOOL = new PrimBoolClassAdapter();
 
-    ClassAdapter<Character, char[]> CHAR = new CharClassAdapter();
+    ClassAdapter<Character, char[]> CHAR = new PrimCharClassAdapter();
 
-    ClassAdapter<Byte, byte[]> BYTE = new ByteClassAdapter();
+    ClassAdapter<Byte, byte[]> BYTE = new PrimByteClassAdapter();
 
-    ClassAdapter<Short, short[]> SHORT = new ShortClassAdapter();
+    ClassAdapter<Short, short[]> SHORT = new PrimShortClassAdapter();
 
-    ClassAdapter<Integer, int[]> INT = new IntClassAdapter();
+    ClassAdapter<Integer, int[]> INT = new PrimIntClassAdapter();
 
-    ClassAdapter<Float, float[]> FLOAT = new FloatClassAdapter();
+    ClassAdapter<Float, float[]> FLOAT = new PrimFloatClassAdapter();
 
-    ClassAdapter<Double, double[]> DOUBLE = new DoubleClassAdapter();
+    ClassAdapter<Double, double[]> DOUBLE = new PrimDoubleClassAdapter();
 
-    ClassAdapter<Long, long[]> LONG = new LongClassAdapter();
+    ClassAdapter<Long, long[]> LONG = new PrimLongClassAdapter();
 
     ClassAdapter<Object, Object[]> OBJECT = new ObjectClassAdapter();
 }

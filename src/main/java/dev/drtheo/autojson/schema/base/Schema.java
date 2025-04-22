@@ -12,18 +12,23 @@ import dev.drtheo.autojson.util.UnsafeUtil;
  *
  * @param <T> the type this schema serializes.
  */
+@SuppressWarnings("unchecked")
 public sealed interface Schema<T> permits ArraySchema, ObjectSchema, PrimitiveSchema, WrapperSchema {
 
-    default ArraySchema<T, ?> asArray() {
-        return (ArraySchema<T, ?>) this;
+    default <S> ArraySchema<S, ?> asArray() {
+        return (ArraySchema<S, ?>) this;
     }
 
-    default ObjectSchema<T> asObject() {
-        return (ObjectSchema<T>) this;
+    default <S> ObjectSchema<S> asObject() {
+        return (ObjectSchema<S>) this;
     }
 
-    default PrimitiveSchema<T> asPrimitive() {
-        return (PrimitiveSchema<T>) this;
+    default <S> PrimitiveSchema<S> asPrimitive() {
+        return (PrimitiveSchema<S>) this;
+    }
+
+    default <S> WrapperSchema<S, ?> asWrapper() {
+        return (WrapperSchema<S, ?>) this;
     }
 
     /**
@@ -38,7 +43,7 @@ public sealed interface Schema<T> permits ArraySchema, ObjectSchema, PrimitiveSc
 
     <To> JsonSerializationContext.Built serialize(JsonAdapter<Object, To> adapter, JsonSerializationContext ctx, T t);
 
-    // FIXME TypeHints
+    // TODO TypeHints
     //Schema<T> wrap(Class<? extends T> clazz);
 
     /**
