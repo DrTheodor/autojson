@@ -14,6 +14,6 @@ title: Benchmark
 | ait.ToObjAITBenchmark.gsonDeserialize | avgt | 10  | 50.200 | ± 0.549 | ms/op |
 
 (Ran x1000 times)
-Benchmarked on `<fill me later>`.
+Benchmarked on [`3324422`](https://github.com/DrTheodor/autojson/commit/3324422f510756a800b1f4463c4f6535179fa006).
 
 ![Performance comparison bar chart](../../assets/performance.png)
