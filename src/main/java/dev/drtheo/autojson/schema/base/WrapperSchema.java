@@ -32,8 +32,17 @@ public non-sealed interface WrapperSchema<T, B> extends Schema<T> {
         return SchemaType.WRAPPER;
     }
 
+    /**
+     * @return the type you're wrapping (same as {@link T}).
+     */
     Type wrapping();
 
+    /**
+     * @param adapter the adapter used to deserialize this object.
+     * @param t the object you're deserializing the data into.
+     * @return The deserialized wrapped object.
+     * @param <To> the type the adapter serializes to.
+     */
     <To> T deserialize(JsonAdapter<Object, To> adapter, B t);
 
     /**
