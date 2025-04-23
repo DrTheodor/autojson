@@ -21,7 +21,7 @@ public non-sealed interface PrimitiveSchema<T> extends Schema<T> {
     <To> void serialize(JsonAdapter<Object, To> adapter, JsonSerializationContext.Primitive ctx, T t);
 
     @Override
-    default SchemaType type() {
+    default byte type() {
         return SchemaType.PRIMITIVE;
     }
 

@@ -39,7 +39,7 @@ public sealed interface Schema<T> permits ArraySchema, ObjectSchema, PrimitiveSc
      *
      * @return the type of this schema.
      */
-    SchemaType type();
+    byte type();
 
     <To> JsonSerializationContext.Built serialize(JsonAdapter<Object, To> adapter, JsonSerializationContext ctx, T t);
 

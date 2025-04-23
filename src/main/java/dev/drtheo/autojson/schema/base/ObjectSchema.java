@@ -26,7 +26,7 @@ public non-sealed interface ObjectSchema<T> extends Schema<T> {
     T instantiate();
 
     @Override
-    default SchemaType type() {
+    default byte type() {
         return SchemaType.OBJECT;
     }
 

@@ -36,7 +36,7 @@ public non-sealed interface ArraySchema<T, Intermediary> extends Schema<T> {
     T pack(Intermediary obj);
 
     @Override
-    default SchemaType type() {
+    default byte type() {
         return SchemaType.ARRAY;
     }
 

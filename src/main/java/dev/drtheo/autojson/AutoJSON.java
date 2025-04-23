@@ -35,6 +35,8 @@ public class AutoJSON implements SchemaHolder, DelegateLogger {
     private int layer = 0;
     private boolean logMisingEntries = true;
     private boolean safeInstancing = false;
+    private boolean useCustomEnumMap = false;
+    private boolean useCustomFieldMap = true;
 
     public AutoJSON() {
         this.logger = this.setupLogger();
@@ -60,6 +62,22 @@ public class AutoJSON implements SchemaHolder, DelegateLogger {
      */
     public boolean logMissingEntries() {
         return logMisingEntries;
+    }
+
+    public void setUseCustomEnumMap(boolean useCustomEnumMap) {
+        this.useCustomEnumMap = useCustomEnumMap;
+    }
+
+    public boolean useFastMaps() {
+        return useCustomEnumMap;
+    }
+
+    public void setUseCustomFieldMap(boolean useCustomFieldMap) {
+        this.useCustomFieldMap = useCustomFieldMap;
+    }
+
+    public boolean useCustomFieldMap() {
+        return useCustomFieldMap;
     }
 
     /**
@@ -185,7 +203,8 @@ public class AutoJSON implements SchemaHolder, DelegateLogger {
                 return (Schema<T>) JavaArraySchema.unwrap(this, clazz);
 
             if (clazz.isEnum())
-                return (Schema<T>) JavaEnumSchema.unwrap(clazz);
+                return useCustomEnumMap ? (Schema<T>) JavaEnumSchemaFastMap.unwrap(clazz)
+                        : (Schema<T>) JavaEnumSchemaSimple.unwrap(clazz);
 
             return (Schema<T>) BakedClassAutoSchema.bake(this, clazz);
         }

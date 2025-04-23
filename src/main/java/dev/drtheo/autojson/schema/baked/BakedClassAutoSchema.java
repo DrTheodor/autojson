@@ -9,8 +9,8 @@ import dev.drtheo.autojson.adapter.JsonDeserializationContext;
 import dev.drtheo.autojson.adapter.JsonSerializationContext;
 import dev.drtheo.autojson.annotation.Exclude;
 import dev.drtheo.autojson.annotation.Instantiate;
-import dev.drtheo.autojson.annotation.TypeHint;
 import dev.drtheo.autojson.util.ClassAdapter;
+import dev.drtheo.autojson.util.FastStringMap;
 import dev.drtheo.autojson.util.Lazy;
 import dev.drtheo.autojson.util.UnsafeUtil;
 
@@ -44,8 +44,8 @@ public class BakedClassAutoSchema<T> implements ObjectSchema<T> {
 
         FieldType<T, ?>[] types = new FieldType[fields.size()];
 
-        // maybe use a linkedhashmap?
-        Map<String, FieldType<T, ?>> map = new HashMap<>(types.length);
+        Map<String, FieldType<T, ?>> map = auto.useCustomFieldMap() ? new FastStringMap<>(types.length)
+                : new HashMap<>(types.length);
 
         for (int i = 0; i < types.length; i++) {
             Field field = fields.get(i);
@@ -65,16 +65,7 @@ public class BakedClassAutoSchema<T> implements ObjectSchema<T> {
             Type type = field.getGenericType();
             ClassAdapter<E, E[]> adapter = (ClassAdapter<E, E[]>) ClassAdapter.match(type);
 
-            // TODO: TypeHints
-            //TypeHint hint = field.getAnnotation(TypeHint.class);
             Lazy<Schema<E>> schema = new Lazy<>(() -> holder.schema(type));
-
-            // FIXME @TypeHint
-//            if (hint != null)
-//                schema = new TypeWrapperSchema<>(
-//                        holder, type, () -> Schema.createInstance(
-//                                (Class<? extends E>) hint.value(), true)
-//                );
 
             return new FieldType<>(type, adapter, field.getName(),
                     UnsafeUtil.UNSAFE.objectFieldOffset(field), schema);
@@ -122,7 +113,7 @@ public class BakedClassAutoSchema<T> implements ObjectSchema<T> {
         if (field == null)
             return;
 
-        c.obj$put(field.name(), field.get(t), field.type(), field.schema().get());
+        c.obj$put(field.name, field.get(t), field.type, field.schema.get());
     }
 
     @Override
@@ -145,7 +136,7 @@ public class BakedClassAutoSchema<T> implements ObjectSchema<T> {
     }
 
     private static <T, E> void deserialize(FieldType<T, E> field, T t, JsonDeserializationContext c) {
-        E e = c.decode(field.type(), field.schema().get());
+        E e = c.decode(field.type, field.schema.get());
         field.set(t, e);
     }
 }

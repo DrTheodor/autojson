@@ -73,12 +73,11 @@ public class JsonReader {
 
     private Token nextToken0() {
         while (true) {
-            skipWhitespace();
-
             if (!this.hasNext())
                 throw syntaxError("EOF");
 
-            if (this.currentChar == ',' || this.currentChar == ':') {
+            if (this.currentChar == ',' || this.currentChar == ':' || currentChar == ' '
+                    || currentChar == '\t' || currentChar == '\n' || currentChar == '\r') {
                 this.advance();
                 continue;
             }
@@ -217,12 +216,6 @@ public class JsonReader {
         }
 
         return new LazilyParsedNumber(returning);
-    }
-
-    private void skipWhitespace() {
-        while (currentChar == ' ' || currentChar == '\t' || currentChar == '\n' || currentChar == '\r') {
-            advance();
-        }
     }
 
     private void consume(char c) {

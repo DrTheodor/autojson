@@ -28,7 +28,7 @@ public non-sealed interface WrapperSchema<T, B> extends Schema<T> {
     }
 
     @Override
-    default SchemaType type() {
+    default byte type() {
         return SchemaType.WRAPPER;
     }
 

@@ -4,18 +4,24 @@ import dev.drtheo.autojson.adapter.JsonAdapter;
 import dev.drtheo.autojson.adapter.JsonDeserializationContext;
 import dev.drtheo.autojson.adapter.JsonSerializationContext;
 import dev.drtheo.autojson.schema.base.PrimitiveSchema;
+import dev.drtheo.autojson.util.FastStringMap;
 
-public class JavaEnumSchema<T extends Enum<T>> implements PrimitiveSchema<T> {
+public class JavaEnumSchemaFastMap<T extends Enum<T>> implements PrimitiveSchema<T> {
 
-    private final Class<T> enumClass;
+    private final FastStringMap<T> map;
 
     @SuppressWarnings("unchecked")
-    public static <T, E extends Enum<E>> JavaEnumSchema<E> unwrap(Class<T> clazz) {
-        return new JavaEnumSchema<>((Class<E>) clazz);
+    public static <T, E extends Enum<E>> JavaEnumSchemaFastMap<E> unwrap(Class<T> clazz) {
+        return new JavaEnumSchemaFastMap<>((Class<E>) clazz);
     }
 
-    public JavaEnumSchema(Class<T> enumClass) {
-        this.enumClass = enumClass;
+    public JavaEnumSchemaFastMap(Class<T> enumClass) {
+        T[] consts = enumClass.getEnumConstants();
+        this.map = new FastStringMap<>(consts.length);
+
+        for (T t : consts) {
+            map.put(t.toString(), t);
+        }
     }
 
     @Override
@@ -30,6 +36,6 @@ public class JavaEnumSchema<T extends Enum<T>> implements PrimitiveSchema<T> {
         if (s == null)
             return null;
 
-        return Enum.valueOf(enumClass, s);
+        return this.map.get(s);
     }
 }

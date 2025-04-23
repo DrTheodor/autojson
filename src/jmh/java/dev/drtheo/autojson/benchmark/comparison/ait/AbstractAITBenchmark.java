@@ -66,19 +66,17 @@ public class AbstractAITBenchmark extends AutoVsGsonBenchmark {
         auto.schema(Id.class, new IdSchema());
         auto.schema(TardisHandlersManager.class, new HandlersManagerSchema());
 
-        for (int i = 0; i < iters; i++) {
+        for (int i = 0; i < 1_000_000; i++) {
             adapter.toJson(tardis);
         }
 
         Files.writeString(path, adapter.toJson(tardis));
         String raw = Files.readString(path);
 
-        for (int i = 0; i < iters; i++) {
+        for (int i = 0; i < 1_000_000; i++) {
             adapter.fromJson(raw, Tardis.class);
         }
     }
-
-
 
     static class WorldKeySchema implements PrimitiveSchema<WorldKey> {
 
