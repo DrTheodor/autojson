@@ -3,11 +3,15 @@ package dev.drtheo.autojson.adapter.string;
 import dev.drtheo.autojson.AutoJSON;
 import dev.drtheo.autojson.adapter.JsonDeserializationContext;
 import dev.drtheo.autojson.adapter.string.parser.JsonReader;
+import dev.drtheo.autojson.adapter.string.parser.Token;
+import dev.drtheo.autojson.adapter.string.parser.TokenType;
 import dev.drtheo.autojson.schema.base.*;
 import dev.drtheo.autojson.util.ClassAdapter;
 import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.Type;
+
+import static dev.drtheo.autojson.adapter.string.parser.TokenType.*;
 
 public class JsonStringParser implements JsonDeserializationContext {
 
@@ -79,18 +83,18 @@ public class JsonStringParser implements JsonDeserializationContext {
         T t = o.instantiate();
 
         while (reader.hasNext()) {
-            JsonReader.Token name = reader.nextToken();
+            Token name = reader.nextToken();
 
-            if (name.type() == JsonReader.TokenType.END_OBJECT)
+            if (name.type == TokenType.END_OBJECT)
                 break;
 
-            if (name.type() != JsonReader.TokenType.NAME)
+            if (name.type != TokenType.NAME)
                 continue;
 
-            JsonReader.Token value = reader.nextToken();
+            Token value = reader.nextToken();
 
             this.setValue(value);
-            o.deserialize(this.adapter, this, t, (String) name.value());
+            o.deserialize(this.adapter, this, t, (String) name.value);
         }
 
         return t;
@@ -105,9 +109,9 @@ public class JsonStringParser implements JsonDeserializationContext {
         int i = 0;
 
         while (reader.hasNext()) {
-            JsonReader.Token value = reader.nextToken();
+            Token value = reader.nextToken();
 
-            if (value.type() == JsonReader.TokenType.END_ARRAY)
+            if (value.type == TokenType.END_ARRAY)
                 break;
 
             this.setValue(value);
@@ -124,14 +128,14 @@ public class JsonStringParser implements JsonDeserializationContext {
         return o.deserialize(this.adapter, this);
     }
 
-    private void setValue(JsonReader.Token value) {
-        this.current = switch (value.type()) {
-            case NUMBER, STRING, BOOL, NULL -> value.value();
+    private void setValue(Token value) {
+        this.current = switch (value.type) {
+            case NUMBER, STRING, BOOL, NULL -> value.value;
 
             case BEGIN_ARRAY -> ARRAY_MARKER;
             case BEGIN_OBJECT -> OBJ_MARKER;
 
-            default -> throw new IllegalStateException(value.type().toString());
+            default -> throw new IllegalStateException(TokenType.from(value.type));
         };
     }
 

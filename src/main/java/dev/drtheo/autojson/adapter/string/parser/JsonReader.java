@@ -53,20 +53,6 @@ public class JsonReader {
         }
     }
 
-    public enum TokenType {
-        BEGIN_OBJECT,
-        END_OBJECT,
-        BEGIN_ARRAY,
-        END_ARRAY,
-        NAME,
-        STRING,
-        NUMBER,
-        BOOL,
-        NULL,
-    }
-
-    public record Token(TokenType type, Object value) { }
-
     public boolean hasNext() {
         return this.currentChar != -1;
     }
@@ -131,27 +117,27 @@ public class JsonReader {
     }
 
     private Object parseNull() {
-        expect("null");
+        expect('n', 'u', 'l', 'l');
         return null;
     }
 
     private boolean parseBoolean() {
         if (currentChar == 't') {
-            expect("true");
+            expect('t', 'r', 'u', 'e');
             return true;
         } else if (currentChar == 'f') {
-            expect("false");
+            expect('f', 'a', 'l', 's', 'e');
             return false;
         }
 
         throw syntaxError("Expected boolean");
     }
 
-    private void expect(String expected) {
-        for (int i = 0; i < expected.length(); i++) {
-            if (currentChar != expected.charAt(i)) {
-                throw syntaxError("Expected " + expected);
-            }
+    private void expect(char... chars) {
+        for (char aChar : chars) {
+            if (currentChar != aChar)
+                throw syntaxError("Expected " + new String(chars));
+
             advance();
         }
     }

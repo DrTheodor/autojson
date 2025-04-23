@@ -3,10 +3,8 @@ package dev.drtheo.autojson.util;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.function.BiConsumer;
 
 public class FastStringMap<V> implements Map<String, V> {
 
@@ -37,11 +35,6 @@ public class FastStringMap<V> implements Map<String, V> {
 
     @Override
     public boolean containsValue(Object value) {
-        throw new IllegalStateException();
-    }
-
-    @Override
-    public V get(Object key) {
         throw new IllegalStateException();
     }
 
@@ -91,6 +84,11 @@ public class FastStringMap<V> implements Map<String, V> {
         }
 
         return null;
+    }
+
+    @Override
+    public V get(Object key) {
+        return get((String) key);
     }
 
     private static int fastHash(String s) {

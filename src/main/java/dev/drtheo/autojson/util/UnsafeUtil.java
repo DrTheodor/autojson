@@ -41,8 +41,10 @@ public class UnsafeUtil {
         if (!(type instanceof Class<?> clazz))
             return false;
 
-        return clazz.isPrimitive()
-                || clazz == Boolean.class || clazz == Integer.class
+        if (clazz.isPrimitive())
+            return true;
+
+        return clazz == Boolean.class || clazz == Integer.class
                 || clazz == Double.class || clazz == Float.class
                 || clazz == Character.class || clazz == Byte.class
                 || clazz == Short.class || clazz == Long.class;
