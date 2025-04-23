@@ -249,3 +249,14 @@ class MyPhoneSchema implements PrimitiveSchema<Phone> {
 ### String Schema
 For utility purposes there's the [`StringSchema`](/autojson/reference/autojson/dev.drtheo.autojson.schema.util/-string-schema/index.html),
  which is used by `String2ObjectMapSchema` and such.
+
+import { Badge } from '@astrojs/starlight/components';
+
+## Wrappers <Badge text="New" size="large" />
+In some situations, you want to wrap a value. For example, it could be
+a lock. Or an object that allows you to lazily initialize the value
+or something else entirely.
+
+Wrapper schemas redirect serialization to their child schema and supply
+the deserialized object.
+

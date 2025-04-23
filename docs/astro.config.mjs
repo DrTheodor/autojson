@@ -2,6 +2,8 @@
 import { defineConfig } from 'astro/config';
 import starlight from '@astrojs/starlight';
 
+import starlightImageZoom from 'starlight-image-zoom'
+
 // https://astro.build/config
 export default defineConfig({
 	site: 'https://theo.is-a.dev',
@@ -11,11 +13,7 @@ export default defineConfig({
 			title: 'AutoJSON',
 			social: [{ icon: 'github', label: 'GitHub', href: 'https://github.com/DrTheodor/autojson' }],
 			sidebar: [
-				{
-					label: 'Reference',
-					badge: 'JavaDocs',
-					link: '/reference',
-				},
+				{ label: 'Reference', link: '/reference', badge: { text: 'JavaDocs', variant: 'tip' } },
 				{
 					label: 'Guides',
 					items: [
@@ -28,11 +26,14 @@ export default defineConfig({
 						{ label: 'Tips & Tricks', slug: 'guides/tips-n-tricks' },
 					],
 				},
-				{ label: 'Benchmark', slug: 'benchmark' }
+				{ label: 'Benchmark', slug: 'benchmark', badge: { text: 'JMH', variant: 'note' } }
 			],
 			editLink: {
 				baseUrl: 'https://github.com/DrTheodor/autojson/edit/main/docs/'
-			}
+			},
+			plugins: [
+				starlightImageZoom(),
+			],
 		}),
 	],
 });

@@ -54,8 +54,7 @@ def plot_benchmarks(data):
         ax.text(i - width/2, total, f'{val:.1f} ±{err:.1f}',
                 ha='center', va='bottom', fontsize=9)
 
-    # For Gson bars
-    for i, (val, err, total) in enumerate(zip(gson_vals, auto_errs, gson_total)):
+    for i, (val, err, total) in enumerate(zip(gson_vals, gson_errs, gson_total)):
         ax.text(i + width/2, total, f'{val:.1f} ±{err:.1f}',
                 ha='center', va='bottom', fontsize=9)
 
