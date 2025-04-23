@@ -19,7 +19,7 @@ public class JsonReader {
     private boolean isMapped = false;
 
     private int depth;
-    private final Boolean[] objectStack = new Boolean[32];
+    private final boolean[] objectStack = new boolean[32];
 
     public JsonReader(String raw) {
         this.reader = new StringReader(raw);
@@ -263,7 +263,7 @@ public class JsonReader {
     }
 
     private void popStack() {
-        this.objectStack[this.depth--] = null;
+        this.objectStack[this.depth--] = false;
 
         this.isMapped = this.depth > 0 && this.objectStack[this.depth];
         this.expectsValue = !this.isMapped;

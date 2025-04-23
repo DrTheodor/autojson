@@ -27,8 +27,8 @@ public class AutoJSON implements SchemaHolder, DelegateLogger {
         return UnsafeUtil.isPrimitive(type) || type == String.class || type == LazilyParsedNumber.class;
     }
 
-    private final Map<Type, Schema<?>> schemas = new HashMap<>();
-    private final Map<Type, TemplateCreator<?>> templates = new HashMap<>();
+    private final Map<Type, Schema<?>> schemas = new IdentityHashMap<>();
+    private final Map<Type, TemplateCreator<?>> templates = new IdentityHashMap<>();
 
     private final Logger logger;
 
