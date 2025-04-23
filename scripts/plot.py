@@ -60,7 +60,7 @@ def plot_benchmarks(data):
                 ha='center', va='bottom', fontsize=9)
 
     ax.set_title('Serialization Performance Comparison')
-    ax.set_ylabel('Time (ms/op)')
+    ax.set_ylabel('Time (ns/op)')
     ax.set_xticks(x)
     ax.set_xticklabels(ops, rotation=45, ha='right')
     ax.legend()
