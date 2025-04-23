@@ -36,7 +36,7 @@ public class AutoJSON implements SchemaHolder, DelegateLogger {
     private boolean logMisingEntries = true;
     private boolean safeInstancing = false;
     private boolean useCustomEnumMap = false;
-    private boolean useCustomFieldMap = true;
+    private boolean useCustomFieldMap = false;
 
     public AutoJSON() {
         this.logger = this.setupLogger();

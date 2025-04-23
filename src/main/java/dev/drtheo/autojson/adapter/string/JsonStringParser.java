@@ -85,16 +85,16 @@ public class JsonStringParser implements JsonDeserializationContext {
         while (reader.hasNext()) {
             Token name = reader.nextToken();
 
-            if (name.type == TokenType.END_OBJECT)
+            if (name.type() == TokenType.END_OBJECT)
                 break;
 
-            if (name.type != TokenType.NAME)
+            if (name.type() != TokenType.NAME)
                 continue;
 
             Token value = reader.nextToken();
 
             this.setValue(value);
-            o.deserialize(this.adapter, this, t, (String) name.value);
+            o.deserialize(this.adapter, this, t, (String) name.value());
         }
 
         return t;
@@ -111,7 +111,7 @@ public class JsonStringParser implements JsonDeserializationContext {
         while (reader.hasNext()) {
             Token value = reader.nextToken();
 
-            if (value.type == TokenType.END_ARRAY)
+            if (value.type() == TokenType.END_ARRAY)
                 break;
 
             this.setValue(value);
@@ -129,13 +129,13 @@ public class JsonStringParser implements JsonDeserializationContext {
     }
 
     private void setValue(Token value) {
-        this.current = switch (value.type) {
-            case NUMBER, STRING, BOOL, NULL -> value.value;
+        this.current = switch (value.type()) {
+            case NUMBER, STRING, BOOL, NULL -> value.value();
 
             case BEGIN_ARRAY -> ARRAY_MARKER;
             case BEGIN_OBJECT -> OBJ_MARKER;
 
-            default -> throw new IllegalStateException(TokenType.from(value.type));
+            default -> throw new IllegalStateException(TokenType.from(value.type()));
         };
     }
 
