@@ -6,23 +6,29 @@ $dokka.location:dev.drtheo.autojson.adapter.string.parser/JsonParseException/Jso
 $dokka.location:dev.drtheo.autojson.adapter.string.parser/JsonParseException/JsonParseException/#java.lang.String/PointingToDeclaration/autojson/dev.drtheo.autojson.adapter.string.parser/-json-parse-exception/-json-parse-exception.html
 $dokka.location:dev.drtheo.autojson.adapter.string.parser/JsonParseException/JsonParseException/#java.lang.Throwable/PointingToDeclaration/autojson/dev.drtheo.autojson.adapter.string.parser/-json-parse-exception/-json-parse-exception.html
 $dokka.location:dev.drtheo.autojson.adapter.string.parser/JsonReader///PointingToDeclaration/autojson/dev.drtheo.autojson.adapter.string.parser/-json-reader/index.html
-$dokka.location:dev.drtheo.autojson.adapter.string.parser/JsonReader/JsonReader/#java.lang.String/PointingToDeclaration/autojson/dev.drtheo.autojson.adapter.string.parser/-json-reader/-json-reader.html
+$dokka.location:dev.drtheo.autojson.adapter.string.parser/JsonReader/JsonReader/#boolean#java.lang.String/PointingToDeclaration/autojson/dev.drtheo.autojson.adapter.string.parser/-json-reader/-json-reader.html
 $dokka.location:dev.drtheo.autojson.adapter.string.parser/JsonReader/hasNext/#/PointingToDeclaration/autojson/dev.drtheo.autojson.adapter.string.parser/-json-reader/has-next.html
 $dokka.location:dev.drtheo.autojson.adapter.string.parser/JsonReader/nextToken/#/PointingToDeclaration/autojson/dev.drtheo.autojson.adapter.string.parser/-json-reader/next-token.html
 $dokka.location:dev.drtheo.autojson.adapter.string.parser/JsonSyntaxException///PointingToDeclaration/autojson/dev.drtheo.autojson.adapter.string.parser/-json-syntax-exception/index.html
 $dokka.location:dev.drtheo.autojson.adapter.string.parser/JsonSyntaxException/JsonSyntaxException/#java.lang.String#java.lang.Throwable/PointingToDeclaration/autojson/dev.drtheo.autojson.adapter.string.parser/-json-syntax-exception/-json-syntax-exception.html
 $dokka.location:dev.drtheo.autojson.adapter.string.parser/JsonSyntaxException/JsonSyntaxException/#java.lang.String/PointingToDeclaration/autojson/dev.drtheo.autojson.adapter.string.parser/-json-syntax-exception/-json-syntax-exception.html
 $dokka.location:dev.drtheo.autojson.adapter.string.parser/JsonSyntaxException/JsonSyntaxException/#java.lang.Throwable/PointingToDeclaration/autojson/dev.drtheo.autojson.adapter.string.parser/-json-syntax-exception/-json-syntax-exception.html
+$dokka.location:dev.drtheo.autojson.adapter.string.parser/LazilyParsedNumber.Lossy///PointingToDeclaration/autojson/dev.drtheo.autojson.adapter.string.parser/-lazily-parsed-number/-lossy/index.html
+$dokka.location:dev.drtheo.autojson.adapter.string.parser/LazilyParsedNumber.Lossy/LazilyParsedNumber.Lossy/#java.lang.String/PointingToDeclaration/autojson/dev.drtheo.autojson.adapter.string.parser/-lazily-parsed-number/-lossy/-lazily-parsed-number.-lossy.html
+$dokka.location:dev.drtheo.autojson.adapter.string.parser/LazilyParsedNumber.Lossy/byteValue/#/PointingToDeclaration/autojson/dev.drtheo.autojson.adapter.string.parser/-lazily-parsed-number/-lossy/byte-value.html
+$dokka.location:dev.drtheo.autojson.adapter.string.parser/LazilyParsedNumber.Lossy/doubleValue/#/PointingToDeclaration/autojson/dev.drtheo.autojson.adapter.string.parser/-lazily-parsed-number/-lossy/double-value.html
+$dokka.location:dev.drtheo.autojson.adapter.string.parser/LazilyParsedNumber.Lossy/floatValue/#/PointingToDeclaration/autojson/dev.drtheo.autojson.adapter.string.parser/-lazily-parsed-number/-lossy/float-value.html
+$dokka.location:dev.drtheo.autojson.adapter.string.parser/LazilyParsedNumber.Lossy/intValue/#/PointingToDeclaration/autojson/dev.drtheo.autojson.adapter.string.parser/-lazily-parsed-number/-lossy/int-value.html
+$dokka.location:dev.drtheo.autojson.adapter.string.parser/LazilyParsedNumber.Lossy/longValue/#/PointingToDeclaration/autojson/dev.drtheo.autojson.adapter.string.parser/-lazily-parsed-number/-lossy/long-value.html
+$dokka.location:dev.drtheo.autojson.adapter.string.parser/LazilyParsedNumber.Lossy/shortValue/#/PointingToDeclaration/autojson/dev.drtheo.autojson.adapter.string.parser/-lazily-parsed-number/-lossy/short-value.html
 $dokka.location:dev.drtheo.autojson.adapter.string.parser/LazilyParsedNumber///PointingToDeclaration/autojson/dev.drtheo.autojson.adapter.string.parser/-lazily-parsed-number/index.html
 $dokka.location:dev.drtheo.autojson.adapter.string.parser/LazilyParsedNumber/LazilyParsedNumber/#java.lang.String/PointingToDeclaration/autojson/dev.drtheo.autojson.adapter.string.parser/-lazily-parsed-number/-lazily-parsed-number.html
-$dokka.location:dev.drtheo.autojson.adapter.string.parser/LazilyParsedNumber/byteValue/#/PointingToDeclaration/autojson/dev.drtheo.autojson.adapter.string.parser/-lazily-parsed-number/byte-value.html
 $dokka.location:dev.drtheo.autojson.adapter.string.parser/LazilyParsedNumber/doubleValue/#/PointingToDeclaration/autojson/dev.drtheo.autojson.adapter.string.parser/-lazily-parsed-number/double-value.html
 $dokka.location:dev.drtheo.autojson.adapter.string.parser/LazilyParsedNumber/equals/#java.lang.Object/PointingToDeclaration/autojson/dev.drtheo.autojson.adapter.string.parser/-lazily-parsed-number/equals.html
 $dokka.location:dev.drtheo.autojson.adapter.string.parser/LazilyParsedNumber/floatValue/#/PointingToDeclaration/autojson/dev.drtheo.autojson.adapter.string.parser/-lazily-parsed-number/float-value.html
 $dokka.location:dev.drtheo.autojson.adapter.string.parser/LazilyParsedNumber/hashCode/#/PointingToDeclaration/autojson/dev.drtheo.autojson.adapter.string.parser/-lazily-parsed-number/hash-code.html
 $dokka.location:dev.drtheo.autojson.adapter.string.parser/LazilyParsedNumber/intValue/#/PointingToDeclaration/autojson/dev.drtheo.autojson.adapter.string.parser/-lazily-parsed-number/int-value.html
 $dokka.location:dev.drtheo.autojson.adapter.string.parser/LazilyParsedNumber/longValue/#/PointingToDeclaration/autojson/dev.drtheo.autojson.adapter.string.parser/-lazily-parsed-number/long-value.html
-$dokka.location:dev.drtheo.autojson.adapter.string.parser/LazilyParsedNumber/shortValue/#/PointingToDeclaration/autojson/dev.drtheo.autojson.adapter.string.parser/-lazily-parsed-number/short-value.html
 $dokka.location:dev.drtheo.autojson.adapter.string.parser/LazilyParsedNumber/toString/#/PointingToDeclaration/autojson/dev.drtheo.autojson.adapter.string.parser/-lazily-parsed-number/to-string.html
 $dokka.location:dev.drtheo.autojson.adapter.string.parser/Token///PointingToDeclaration/autojson/dev.drtheo.autojson.adapter.string.parser/-token/index.html
 $dokka.location:dev.drtheo.autojson.adapter.string.parser/Token/Token/#/PointingToDeclaration/autojson/dev.drtheo.autojson.adapter.string.parser/-token/-token.html
@@ -343,6 +349,7 @@ $dokka.location:dev.drtheo.autojson/AutoJSON/schema/#java.lang.reflect.Type#dev.
 $dokka.location:dev.drtheo.autojson/AutoJSON/schema/#java.lang.reflect.Type/PointingToDeclaration/autojson/dev.drtheo.autojson/-auto-j-s-o-n/schema.html
 $dokka.location:dev.drtheo.autojson/AutoJSON/setLayer/#int/PointingToDeclaration/autojson/dev.drtheo.autojson/-auto-j-s-o-n/set-layer.html
 $dokka.location:dev.drtheo.autojson/AutoJSON/setLogMisingEntries/#boolean/PointingToDeclaration/autojson/dev.drtheo.autojson/-auto-j-s-o-n/set-log-mising-entries.html
+$dokka.location:dev.drtheo.autojson/AutoJSON/setLossyNumbers/#boolean/PointingToDeclaration/autojson/dev.drtheo.autojson/-auto-j-s-o-n/set-lossy-numbers.html
 $dokka.location:dev.drtheo.autojson/AutoJSON/setSafeInstancing/#boolean/PointingToDeclaration/autojson/dev.drtheo.autojson/-auto-j-s-o-n/set-safe-instancing.html
 $dokka.location:dev.drtheo.autojson/AutoJSON/setUseCustomEnumMap/#boolean/PointingToDeclaration/autojson/dev.drtheo.autojson/-auto-j-s-o-n/set-use-custom-enum-map.html
 $dokka.location:dev.drtheo.autojson/AutoJSON/setUseCustomFieldMap/#boolean/PointingToDeclaration/autojson/dev.drtheo.autojson/-auto-j-s-o-n/set-use-custom-field-map.html
@@ -350,8 +357,9 @@ $dokka.location:dev.drtheo.autojson/AutoJSON/shouldExclude/#java.lang.reflect.Fi
 $dokka.location:dev.drtheo.autojson/AutoJSON/template/#java.lang.Class<? super T>#dev.drtheo.autojson.AutoJSON.TemplateCreator<T>/PointingToDeclaration/autojson/dev.drtheo.autojson/-auto-j-s-o-n/template.html
 $dokka.location:dev.drtheo.autojson/AutoJSON/toJson/#dev.drtheo.autojson.adapter.JsonAdapter<F,T>#java.lang.Object#java.lang.Class<?>/PointingToDeclaration/autojson/dev.drtheo.autojson/-auto-j-s-o-n/to-json.html
 $dokka.location:dev.drtheo.autojson/AutoJSON/toJson/#dev.drtheo.autojson.adapter.JsonAdapter<F,T>#java.lang.Object/PointingToDeclaration/autojson/dev.drtheo.autojson/-auto-j-s-o-n/to-json.html
+$dokka.location:dev.drtheo.autojson/AutoJSON/useCustomEnumMap/#/PointingToDeclaration/autojson/dev.drtheo.autojson/-auto-j-s-o-n/use-custom-enum-map.html
 $dokka.location:dev.drtheo.autojson/AutoJSON/useCustomFieldMap/#/PointingToDeclaration/autojson/dev.drtheo.autojson/-auto-j-s-o-n/use-custom-field-map.html
-$dokka.location:dev.drtheo.autojson/AutoJSON/useFastMaps/#/PointingToDeclaration/autojson/dev.drtheo.autojson/-auto-j-s-o-n/use-fast-maps.html
+$dokka.location:dev.drtheo.autojson/AutoJSON/useLossyNumbers/#/PointingToDeclaration/autojson/dev.drtheo.autojson/-auto-j-s-o-n/use-lossy-numbers.html
 $dokka.location:dev.drtheo.autojson/SchemaHolder///PointingToDeclaration/autojson/dev.drtheo.autojson/-schema-holder/index.html
 $dokka.location:dev.drtheo.autojson/SchemaHolder/schema/#java.lang.reflect.Type/PointingToDeclaration/autojson/dev.drtheo.autojson/-schema-holder/schema.html
 dev.drtheo.autojson
