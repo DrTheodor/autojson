@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import dev.drtheo.autojson.AutoJSON;
 import dev.drtheo.autojson.adapter.string.JsonStringAdapter;
+import dev.drtheo.autojson.adapter.string.parser2.JsonStringAdapter2;
 import dev.drtheo.autojson.benchmark.comparison.beans.Bean;
 import org.openjdk.jmh.annotations.*;
 
@@ -36,7 +37,7 @@ public class AutoVsGsonBenchmark {
         setupGson(builder);
         gson = builder.create();
 
-        adapter = new JsonStringAdapter(auto);
+        adapter = new JsonStringAdapter2(auto);
         bean = new Bean();
     }
 

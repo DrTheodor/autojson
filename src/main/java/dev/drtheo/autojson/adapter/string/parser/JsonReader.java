@@ -7,7 +7,7 @@ import java.io.StringReader;
 public class JsonReader {
 
     private final Reader reader;
-    private final char[] buffer = new char[1024];
+    private final char[] buffer = new char[512];
 
     private int pos = 0;
     private int limit = 0;
@@ -21,7 +21,7 @@ public class JsonReader {
     private int depth;
     private final boolean[] objectStack = new boolean[32];
 
-    private boolean lossyNumbers;
+    private final boolean lossyNumbers;
 
     public JsonReader(boolean lossyNumbers, String raw) {
         this.lossyNumbers = lossyNumbers;

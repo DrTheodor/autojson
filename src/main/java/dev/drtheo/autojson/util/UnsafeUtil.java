@@ -216,6 +216,8 @@ public class UnsafeUtil {
 
     public static void getAllFields(List<Field> list, Class<?> clazz, Predicate<Field> filter) {
         for (Field field : clazz.getDeclaredFields()) {
+            field.setAccessible(true);
+
             if (filter.test(field))
                 list.add(field);
         }
