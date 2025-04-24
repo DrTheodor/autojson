@@ -26,7 +26,7 @@ public class JsonStringParser implements JsonDeserializationContext {
 
     public JsonStringParser(JsonStringAdapter adapter, String raw) {
         this.adapter = adapter;
-        this.reader = new JsonReader(raw);
+        this.reader = new JsonReader(adapter.auto().useLossyNumbers(), raw);
     }
 
     public static <T> T process(JsonStringAdapter adapter, String raw, Type type) {

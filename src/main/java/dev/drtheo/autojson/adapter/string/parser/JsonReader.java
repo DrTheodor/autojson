@@ -21,7 +21,10 @@ public class JsonReader {
     private int depth;
     private final boolean[] objectStack = new boolean[32];
 
-    public JsonReader(String raw) {
+    private boolean lossyNumbers;
+
+    public JsonReader(boolean lossyNumbers, String raw) {
+        this.lossyNumbers = lossyNumbers;
         this.reader = new StringReader(raw);
         this.fillBuffer();
     }
@@ -151,7 +154,7 @@ public class JsonReader {
         while (currentChar != '"') {
             if (pos == limit) {
                 res = new StringBuilder();
-                res.append(buffer, start - 1, pos - start);
+                res.append(buffer, start - 1, pos - start + 1);
                 start = 1;
             }
 
@@ -201,7 +204,7 @@ public class JsonReader {
             returning = new String(buffer, start - 1, pos - start);
         }
 
-        return new LazilyParsedNumber(returning);
+        return lossyNumbers ? new LazilyParsedNumber.Lossy(returning) : new LazilyParsedNumber(returning);
     }
 
     private void consume(char c) {

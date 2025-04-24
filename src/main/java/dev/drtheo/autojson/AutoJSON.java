@@ -37,6 +37,7 @@ public class AutoJSON implements SchemaHolder, DelegateLogger {
     private boolean safeInstancing = false;
     private boolean useCustomEnumMap = false;
     private boolean useCustomFieldMap = false;
+    private boolean lossyNumbers = true;
 
     public AutoJSON() {
         this.logger = this.setupLogger();
@@ -68,8 +69,16 @@ public class AutoJSON implements SchemaHolder, DelegateLogger {
         this.useCustomEnumMap = useCustomEnumMap;
     }
 
-    public boolean useFastMaps() {
+    public boolean useCustomEnumMap() {
         return useCustomEnumMap;
+    }
+
+    public void setLossyNumbers(boolean lossyNumbers) {
+        this.lossyNumbers = lossyNumbers;
+    }
+
+    public boolean useLossyNumbers() {
+        return lossyNumbers;
     }
 
     public void setUseCustomFieldMap(boolean useCustomFieldMap) {
