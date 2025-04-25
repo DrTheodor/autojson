@@ -5,12 +5,12 @@ import dev.drtheo.autojson.adapter.JsonAdapter;
 import dev.drtheo.autojson.adapter.JsonDeserializationContext;
 import dev.drtheo.autojson.adapter.string.JsonStringAdapter;
 import dev.drtheo.autojson.schema.base.*;
+import dev.drtheo.autojson.util.Lazy;
 import jdk.internal.vm.annotation.IntrinsicCandidate;
 import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.Type;
 import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
 
 import static dev.drtheo.autojson.util.UnsafeUtil.UNSAFE;
 
@@ -29,8 +29,7 @@ public class JsonStringParser2 implements JsonDeserializationContext {
 
     protected final byte[] buffer;
     protected int position;
-    protected final ThreadLocal<StringBuilder> stringBuilder =
-            ThreadLocal.withInitial(() -> new StringBuilder(32));
+    protected final Lazy<StringBuilder> numBuilder = new Lazy<>(() -> new StringBuilder(32));
 
     private final JsonStringAdapter adapter;
 
@@ -56,8 +55,7 @@ public class JsonStringParser2 implements JsonDeserializationContext {
 
     @IntrinsicCandidate
     private double parseDoublePrecise(int start, int length, boolean negative) {
-        // Reuse thread-local StringBuilder to avoid allocations
-        StringBuilder sb = stringBuilder.get();
+        StringBuilder sb = numBuilder.get();
         sb.setLength(0);
 
         // Unsafe copy of the number characters
@@ -66,7 +64,7 @@ public class JsonStringParser2 implements JsonDeserializationContext {
         }
 
         // Use Java's built-in parser for perfect accuracy
-        double result = Double.parseDouble(sb.toString());
+        double result = Double.parseDouble(numBuilder.toString());
         return negative ? -result : result;
     }
 

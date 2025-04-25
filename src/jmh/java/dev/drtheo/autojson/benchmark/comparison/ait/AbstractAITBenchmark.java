@@ -61,7 +61,7 @@ public class AbstractAITBenchmark extends AutoVsGsonBenchmark {
 
     public static void main(String[] args) throws IOException {
         AutoJSON auto = new AutoJSON();
-        JsonStringAdapter adapter = new JsonStringAdapter(auto);
+        JsonStringAdapter adapter = new JsonStringAdapter2(auto);
 
         auto.schema(WorldKey.class, new WorldKeySchema());
         auto.schema(Id.class, new IdSchema());

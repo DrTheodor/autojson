@@ -136,7 +136,6 @@ public class BakedClassAutoSchema<T> implements ObjectSchema<T> {
     }
 
     private static <T, E> void deserialize(FieldType<T, E> field, T t, JsonDeserializationContext c) {
-        E e = c.decode(field.type, field.schema.get());
-        field.set(t, e);
+        field.set(t, c.decode(field.type, field.schema.get()));
     }
 }
