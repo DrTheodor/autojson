@@ -6,6 +6,7 @@ import dev.drtheo.autojson.adapter.JsonAdapter;
 import dev.drtheo.autojson.adapter.JsonDeserializationContext;
 import dev.drtheo.autojson.adapter.JsonSerializationContext;
 import dev.drtheo.autojson.adapter.string.JsonStringAdapter;
+import dev.drtheo.autojson.adapter.string.parser2.JsonStringAdapter2;
 import dev.drtheo.autojson.benchmark.comparison.AutoVsGsonBenchmark;
 import dev.drtheo.autojson.benchmark.comparison.ait.data.*;
 import dev.drtheo.autojson.schema.base.ObjectSchema;

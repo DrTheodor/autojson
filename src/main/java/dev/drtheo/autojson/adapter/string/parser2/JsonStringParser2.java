@@ -5,6 +5,7 @@ import dev.drtheo.autojson.adapter.JsonAdapter;
 import dev.drtheo.autojson.adapter.JsonDeserializationContext;
 import dev.drtheo.autojson.adapter.string.JsonStringAdapter;
 import dev.drtheo.autojson.schema.base.*;
+import jdk.internal.vm.annotation.IntrinsicCandidate;
 import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.Type;
@@ -41,6 +42,7 @@ public class JsonStringParser2 implements JsonDeserializationContext {
     }
 
     @Override
+    @IntrinsicCandidate
     @SuppressWarnings("unchecked")
     public <T> T decodeBuiltIn() {
         return (T) switch (buffer[position]) {
@@ -52,6 +54,7 @@ public class JsonStringParser2 implements JsonDeserializationContext {
         };
     }
 
+    @IntrinsicCandidate
     private double parseDoublePrecise(int start, int length, boolean negative) {
         // Reuse thread-local StringBuilder to avoid allocations
         StringBuilder sb = stringBuilder.get();
@@ -67,6 +70,7 @@ public class JsonStringParser2 implements JsonDeserializationContext {
         return negative ? -result : result;
     }
 
+    @IntrinsicCandidate
     private double fastParseSimpleDouble(int start, int length, boolean negative) {
         int i = start;
         long value = 0;
@@ -118,6 +122,7 @@ public class JsonStringParser2 implements JsonDeserializationContext {
         return negative ? -result : result;
     }
 
+    @IntrinsicCandidate
     private int parseIntUnsafe(int start, int length, boolean negative) {
         int result = 0;
         int i = start;
@@ -125,7 +130,7 @@ public class JsonStringParser2 implements JsonDeserializationContext {
         while (i < start + length) {
             byte b = UNSAFE.getByte(buffer, BYTE_ARRAY_OFFSET + i);
             if (b < '0' || b > '9') {
-                throw new RuntimeException("Invalid integer format at position " + i);
+                throw new RuntimeException("Invalid integer format at position " + i + "; expected a digit, but got '" + (char) b + "'");
             }
             result = result * 10 + (b - '0');
             i++;
@@ -134,15 +139,22 @@ public class JsonStringParser2 implements JsonDeserializationContext {
         return negative ? -result : result;
     }
 
+    @IntrinsicCandidate
     private Number parseNumber() {
         boolean isDouble = false;
         boolean hasNotation = false;
 
         byte firstByte = UNSAFE.getByte(buffer, BYTE_ARRAY_OFFSET + position);
-        boolean negative = firstByte == '-';
-        position++;
+        boolean negative = false;
 
-        int start = position;
+        if (firstByte == '+') {
+            position++;
+        } else if (firstByte == '-') {
+            position++;
+            negative = true;
+        }
+
+        final int start = position;
 
         while (position < buffer.length) {
             byte b = buffer[position];
@@ -161,7 +173,7 @@ public class JsonStringParser2 implements JsonDeserializationContext {
 
         final int length = position - start;
         if (length == 0) {
-            throw new RuntimeException("Expected number at position " + position);
+            throw new RuntimeException("Expected number at " + start + ", but got '" + (char) buffer[position] + "'");
         }
 
         // Unsafe direct byte access for number parsing
@@ -177,6 +189,7 @@ public class JsonStringParser2 implements JsonDeserializationContext {
         }
     }
 
+    @IntrinsicCandidate
     public boolean parseTrue() {
         if (position + 3 >= buffer.length &&
                 buffer[position] == 't' &&
@@ -190,6 +203,7 @@ public class JsonStringParser2 implements JsonDeserializationContext {
         throw new IllegalStateException("Expected 'true' but got got '" + buffer[position] + "' at pos " + position);
     }
 
+    @IntrinsicCandidate
     public boolean parseFalse() {
         if (position + 4 < buffer.length &&
                 buffer[position] == 'f' &&
@@ -204,6 +218,7 @@ public class JsonStringParser2 implements JsonDeserializationContext {
         throw new IllegalStateException("Expected 'false' but got got '" + (char) buffer[position] + "' at pos " + position);
     }
 
+    @IntrinsicCandidate
     public Object parseNull() {
         if (position + 3 < buffer.length &&
                 buffer[position] == 'n' &&
@@ -217,6 +232,7 @@ public class JsonStringParser2 implements JsonDeserializationContext {
         throw new IllegalStateException("Expected 'null' but got got '" + buffer[position] + "' at pos " + position);
     }
 
+    @IntrinsicCandidate
     public void skipWhitespace() {
         while (position < buffer.length && isWhitespace(buffer[position])) {
             position++;
@@ -244,16 +260,19 @@ public class JsonStringParser2 implements JsonDeserializationContext {
         return new String(buffer, start, length, StandardCharsets.UTF_8);
     }
 
+    @IntrinsicCandidate
     private void expect(byte c) {
         if (buffer[position] != c)
             throw new IllegalStateException("Expected '" + (char) c + "' at " + position + " but got '" + (char) buffer[position] + "'");
     }
 
+    @IntrinsicCandidate
     private void consume(byte c) {
         expect(c);
         position++;
     }
 
+    @IntrinsicCandidate
     protected void parseObject() {
         consume(LBRACE);
 
@@ -280,6 +299,7 @@ public class JsonStringParser2 implements JsonDeserializationContext {
         }
     }
 
+    @IntrinsicCandidate
     public void parseArray() {
         consume(LBRACKET);
         skipWhitespace();
@@ -310,6 +330,7 @@ public class JsonStringParser2 implements JsonDeserializationContext {
         }
     }
 
+    @IntrinsicCandidate
     private void parseKeyValue() {
         String key = parseString();
 
@@ -320,6 +341,7 @@ public class JsonStringParser2 implements JsonDeserializationContext {
         ((ObjectNode<?>) node).decode(adapter, this, key);
     }
 
+    @IntrinsicCandidate
     private void end() {
         if (node.parent != null)
             node = node.parent;
@@ -399,45 +421,6 @@ public class JsonStringParser2 implements JsonDeserializationContext {
 
         public T pack() {
             return schema.pack(val);
-        }
-    }
-
-    public static void main(String[] args) {
-        String raw = "{\"another\":{\"key\":\"test\",\"ints\":[1,2,3]},\"doubleArray\":[[\"test\", \"wow\", \"this\"], [\"sucks\", \"so\", \"much\"]]}";
-        JsonStringAdapter adapter1 = new JsonStringAdapter(new AutoJSON());
-        JsonStringParser2 parser2 = new JsonStringParser2(adapter1, raw);
-
-        System.out.println(parser2.<Raw>decodeCustom(Raw.class));
-    }
-
-    static class Raw {
-        Raw2 another;
-        String[][] doubleArray;
-
-        @Override
-        public String toString() {
-            if (doubleArray != null) {
-                for (String[] s : doubleArray) {
-                    System.out.println(Arrays.toString(s));
-                }
-            }
-            return "Raw{" +
-                    "another=" + another +
-                    ", doubleArray=" + Arrays.toString(doubleArray) +
-                    '}';
-        }
-    }
-
-    static class Raw2 {
-        String key;
-        int[] ints;
-
-        @Override
-        public String toString() {
-            return "Raw2{" +
-                    "key='" + key + '\'' +
-                    ", ints=" + Arrays.toString(ints) +
-                    '}';
         }
     }
 }
