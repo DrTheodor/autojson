@@ -64,7 +64,7 @@ public class JsonStringParser2 implements JsonDeserializationContext {
         }
 
         // Use Java's built-in parser for perfect accuracy
-        double result = Double.parseDouble(numBuilder.toString());
+        double result = Double.parseDouble(sb.toString());
         return negative ? -result : result;
     }
 
