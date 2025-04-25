@@ -9,8 +9,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
 public class JJBTests {
 
     static String expected;
@@ -20,8 +18,6 @@ public class JJBTests {
 
     static {
         AutoJSON auto = new AutoJSON();
-        auto.setUseCustomFieldMap(true);
-//        auto.setLossyNumbers(false);
 
         adapter = new JsonStringAdapter2(auto);
 
