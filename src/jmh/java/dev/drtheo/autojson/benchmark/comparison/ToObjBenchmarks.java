@@ -4,8 +4,6 @@ import dev.drtheo.autojson.benchmark.comparison.beans.Bean;
 import org.openjdk.jmh.annotations.*;
 import org.openjdk.jmh.infra.Blackhole;
 
-//@Warmup(iterations = 0)
-//@Measurement(iterations = 0)
 public class ToObjBenchmarks extends AutoVsGsonBenchmark {
 
     @Benchmark

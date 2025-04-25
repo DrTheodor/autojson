@@ -189,7 +189,7 @@ public class JsonStringParser2 implements JsonDeserializationContext {
 
     @IntrinsicCandidate
     public boolean parseTrue() {
-        if (position + 3 >= buffer.length &&
+        if (position + 3 < buffer.length &&
                 buffer[position] == 't' &&
                 buffer[position+1] == 'r' &&
                 buffer[position+2] == 'u' &&
@@ -198,7 +198,7 @@ public class JsonStringParser2 implements JsonDeserializationContext {
             return true;
         }
 
-        throw new IllegalStateException("Expected 'true' but got got '" + buffer[position] + "' at pos " + position);
+        throw new IllegalStateException("Expected 'true' but got got '" + new String(buffer, position, 4, StandardCharsets.UTF_8) + "' at pos " + position);
     }
 
     @IntrinsicCandidate
