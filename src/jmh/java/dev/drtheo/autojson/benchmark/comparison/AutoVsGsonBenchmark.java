@@ -14,7 +14,7 @@ import java.util.concurrent.TimeUnit;
 @Measurement(iterations = 10)
 @Fork(value = 1, warmups = 1)
 @OutputTimeUnit(TimeUnit.NANOSECONDS)
-@BenchmarkMode(Mode.AverageTime)
+@BenchmarkMode(Mode.Throughput)
 @State(Scope.Thread)
 public class AutoVsGsonBenchmark {
 
