@@ -43,6 +43,10 @@ java {
     withJavadocJar()
 }
 
+tasks.compileJava {
+    options.compilerArgs.addAll(listOf("--add-exports=java.base/jdk.internal.vm.annotation=ALL-UNNAMED"))
+}
+
 publishing {
     publications {
         create<MavenPublication>("lib") {
