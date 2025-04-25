@@ -43,9 +43,10 @@ public class JsonStringBuilder implements JsonSerializationContext, JsonSerializ
     protected <T> void value(T value, Type type, Schema<T> s) {
         if (value == null) {
             builder.append("null");
-        } else if (value instanceof String || value instanceof Character) {
-            //noinspection UnnecessaryToStringCall
-            builder.append("\"").append(value.toString()).append("\"");
+        } else if (value instanceof Character) {
+            builder.append("\"").append((char) value).append("\"");
+        } else if (value instanceof String str) {
+            builder.append("\"").append(str).append("\"");
         } else if (UnsafeUtil.isPrimitive(value.getClass())) {
             //noinspection UnnecessaryToStringCall
             builder.append(value.toString());
